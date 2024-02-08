@@ -111,16 +111,3 @@ spec:
   - name: port8080
     port: 80
     targetPort: 8080
----
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: frontend
-spec:
-  port:
-    targetPort: port8080
-  to:
-    kind: Service
-    name: frontend
-    weight: 100
-  wildcardPolicy: None
