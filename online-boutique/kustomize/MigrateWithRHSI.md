@@ -2,6 +2,8 @@
 
 - [Migratate the online boutique to different openshift clusters](#migratate-the-online-boutique-to-different-openshift-clusters)
   - [Pre-requisites](#pre-requisites)
+  - [current state](#current-state)
+  - [End state](#end-state)
   - [Migration Steps](#migration-steps)
     - [Install RHSI](#install-rhsi)
       - [OnPrem cluster](#onprem-cluster)
@@ -9,12 +11,13 @@
       - [Tier2 cluster](#tier2-cluster)
       - [Tier3 cluster](#tier3-cluster)
   - [Connect/Link the sites](#connectlink-the-sites)
-      - [Tier1 cluster](#tier1-cluster-1)
-      - [OnPrem cluster](#onprem-cluster-1)
-      - [Tier2 cluster](#tier2-cluster-1)
-      - [Tier3 cluster](#tier3-cluster-1)
-  - [Application migration](#application-migration)
-    - [Tier3 cluster](#tier3-cluster-2)
+    - [**Concepts**](#concepts)
+    - [**Tier1 cluster**](#tier1-cluster-1)
+    - [**OnPrem cluster**](#onprem-cluster-1)
+    - [**Tier2 cluster**](#tier2-cluster-1)
+    - [**Tier3 cluster**](#tier3-cluster-1)
+  - [**Application migration**](#application-migration)
+    - [**Tier3 cluster**](#tier3-cluster-2)
     - [Tier2 Cluster](#tier2-cluster-2)
     - [Tier1 Cluster](#tier1-cluster-2)
 
@@ -24,6 +27,49 @@
    2. oc cli Download it [**here**](http://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.14.0/openshift-client-linux-4.14.0.tar.gz)
    3. Access to openshift clusters 
    
+
+## current state
+
+  ```mermaid
+  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      A[["On-Prem cluster
+        -------------------
+        All microservices
+        deployed here"]]
+      A  
+    
+  ```
+
+## End state
+
+  ```mermaid
+  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      A[["On-Prem cluster
+        -------------------
+        Decomissioned"]]
+        
+      B[["Tier1 cluster
+        -------------------
+        Frontend microservices
+        deployed here"]]
+
+      C[["Tier2 cluster
+        -------------------
+        middleware microservices
+        deployed here"]]
+
+      D[["Tier3 cluster
+        -------------------
+        Payments microservices
+        deployed here"]]
+
+    B <--> C <--> D
+       
+    
+  ```
+
 ## Migration Steps
 
 ### Install RHSI
@@ -99,7 +145,31 @@ skupper init --enable-flow-collector --enable-console --enable-service-sync=fals
 ```
 
 ## Connect/Link the sites
-#### Tier1 cluster
+
+### **Concepts**
+
+1. Each namespaces where skupper is deployed is called a **SITE**.
+2. Communication between sites is established by **LINKS**
+3. **TOKENS** are exchanged between sites to Trust and establish **LINKS**
+4. **TOKENS** can be generated on any site and exchanged with other sites to establish **LINKS**
+5. LINK are UNI-DIRECTIONAL but the exchange of data between sites is  BI-DIRECTIONAL. 
+```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
+    A["Cluster1
+      ---------
+      Deploy Skupper
+      create token"]
+    B["Cluster2
+      ---------
+      Deploy skupper
+      Get token from cluster1 to create link"]
+    B  -- skupper link --> A
+    A  <==data==> B
+```
+
+
+### **Tier1 cluster**
 1. create a token on the tier1 cluster
 
 ```
@@ -112,7 +182,7 @@ skupper token create frontend.yaml --uses=2
 # this will create a file called frontend.yaml in the current working directory
  
 ```
-#### OnPrem cluster
+### **OnPrem cluster**
 2. Use the token generated to create a link with on prem cluster. copy the frontend.yaml to your current working directory if not already available.
 
 ```
@@ -122,11 +192,18 @@ oc apply -f frontend.yaml -n rmallam-base
 
 ```
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph LR
-    
-    B(Tier1 Cluster)-- skupperlink -->A(ONPrem)
+    A["On-Prem cluster
+       All microservices
+       deployed here"]
+    B["Tier1 Cluster
+       Frotend goes here"]
+    A  -- skupper link --> B
+    A  <==data==> B
+   
 ```
-#### Tier2 cluster
+### **Tier2 cluster**
 3. use the same token to create a link from tier2
 
 ```
@@ -138,8 +215,10 @@ oc apply -f frontend.yaml -n rmallam-middleware
 ```mermaid
 graph LR
     
-    B(Tier1 Cluster)<-- skupperlink -->A(ONPrem)
-    B(Tier1 Cluster)<-- skupperlink -->C(Tier2 Cluster)
+    A[ONPrem]  -- skupper link --> B[Tier1 Cluster]
+    A[ONPrem]  <== data ==> B[Tier1 Cluster]
+    B[Tier1 Cluster] <== data ==> C[Tier2 Cluster]
+    C[Tier2 Cluster] -- skupper link --> B[Tier1 Cluster]
 ```
 
 4. Create a token on middleware namespace in Tier2 cluster to establish a link with Payments namespace in Tier3 cluster
@@ -150,7 +229,7 @@ export KUBECONFIG=~/tier2-cluster
 skupper token create middleware.yaml
 
 ```
-#### Tier3 cluster
+### **Tier3 cluster**
 5. Use the middleware.yaml token created in the previous step to establish a link from payments namespace in tier3 cluster to middleware namespace in tier2 cluster
 
 ```
@@ -162,14 +241,18 @@ oc apply -f middleware.yaml -n rmallam-payments
 ```mermaid
 graph LR
     
-    B(Tier1 Cluster)<--<-- skupperlink -->A(ONPrem)
-    B(Tier1 Cluster)<--<-- skupperlink -->C(Tier2 Cluster)
-    C(Tier2 Cluster)<--<-- skupperlink -->D(Tier3 Cluster)
+    A[ONPrem]  -- skupper link --> B[Tier1 Cluster]
+    A[ONPrem]  <== data ==> B[Tier1 Cluster]
+    C[Tier2 Cluster] -- skupper link --> B[Tier1 Cluster]
+    B[Tier1 Cluster] <== data ==> C[Tier2 Cluster]
+    D(Tier3 Cluster) -- skupper link --> C(Tier2 Cluster)
+    C(Tier2 Cluster)<== data ==> D(Tier3 Cluster)
+    
 
 ```
-## Application migration
+## **Application migration**
 
-### Tier3 cluster
+### **Tier3 cluster**
 
 1. starting with the most restricted applications first. payments and email service should go onto payments namespace in tier3 cluster.
 
