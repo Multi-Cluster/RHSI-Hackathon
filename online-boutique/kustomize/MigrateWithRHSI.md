@@ -31,7 +31,7 @@
 1. Install RHSI in the application namespace on the OnPrem cluster
 
 ```
-export kubeconfig=~/onprem-cluster
+export KUBECONFIG=~/onprem-cluster
 
 oc login
 
@@ -40,7 +40,7 @@ oc project rmallam-base
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name base
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name base  --console-user admin --console-password redh@T
 
 ```
 #### Tier1 cluster
@@ -49,7 +49,7 @@ skupper init --enable-flow-collector --enable-console --enable-service-sync=fals
 Create a namespace with a suffix of your team name. 
 
 ```
-export kubeconfig=~/tier1-cluster
+export KUBECONFIG=~/tier1-cluster
 
 oc login
 
@@ -58,7 +58,7 @@ oc new-project rmallam-frontend
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name frontend
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name frontend --console-user admin --console-password redh@T
 
 ```
 #### Tier2 cluster
@@ -67,7 +67,7 @@ skupper init --enable-flow-collector --enable-console --enable-service-sync=fals
 Create a namespace with a suffix of your team name. 
 
 ```
-export kubeconfig=~/tier2-cluster
+export KUBECONFIG=~/tier2-cluster
 
 oc login
 
@@ -76,7 +76,7 @@ oc new-project rmallam-middleware
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name middleware
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name middleware --console-user admin --console-password redh@T
 
 ```
 #### Tier3 cluster
@@ -85,7 +85,7 @@ skupper init --enable-flow-collector --enable-console --enable-service-sync=fals
 Create a namespace with a suffix of your team name.
 
 ```
-export kubeconfig=~/tier3-cluster
+export KUBECONFIG=~/tier3-cluster
 
 oc login 
 
@@ -94,7 +94,7 @@ oc new-project rmallam-payments
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name payments
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name payments --console-user admin --console-password redh@T
 
 ```
 
@@ -103,7 +103,7 @@ skupper init --enable-flow-collector --enable-console --enable-service-sync=fals
 1. create a token on the tier1 cluster
 
 ```
-export kubeconfig=~/tier1-cluster
+export KUBECONFIG=~/tier1-cluster
 
 oc project rmallam-frontend
 
@@ -116,7 +116,7 @@ skupper token create frontend.yaml --uses=2
 2. Use the token generated to create a link with on prem cluster. copy the frontend.yaml to your current working directory if not already available.
 
 ```
-export kubeconfig=~/onprem-cluster
+export KUBECONFIG=~/onprem-cluster
 
 oc apply -f frontend.yaml -n rmallam-base
 
@@ -130,7 +130,7 @@ graph LR
 3. use the same token to create a link from tier2
 
 ```
-export kubeconfig=~/tier2-cluster
+export KUBECONFIG=~/tier2-cluster
 
 oc apply -f frontend.yaml -n rmallam-middleware
 
@@ -138,14 +138,14 @@ oc apply -f frontend.yaml -n rmallam-middleware
 ```mermaid
 graph LR
     
-    B(Tier1 Cluster)-- skupperlink -->A(ONPrem)
-    B(Tier1 Cluster)-- skupperlink -->C(Tier2 Cluster)
+    B(Tier1 Cluster)<-- skupperlink -->A(ONPrem)
+    B(Tier1 Cluster)<-- skupperlink -->C(Tier2 Cluster)
 ```
 
 4. Create a token on middleware namespace in Tier2 cluster to establish a link with Payments namespace in Tier3 cluster
 
 ```
-export kubeconfig=~/tier2-cluster
+export KUBECONFIG=~/tier2-cluster
 
 skupper token create middleware.yaml
 
@@ -154,7 +154,7 @@ skupper token create middleware.yaml
 5. Use the middleware.yaml token created in the previous step to establish a link from payments namespace in tier3 cluster to middleware namespace in tier2 cluster
 
 ```
-export kubeconfig=~/tier2-cluster
+export KUBECONFIG=~/tier3-cluster
 
 oc apply -f middleware.yaml -n rmallam-payments
 
@@ -162,9 +162,9 @@ oc apply -f middleware.yaml -n rmallam-payments
 ```mermaid
 graph LR
     
-    B(Tier1 Cluster)<-- skupperlink -->A(ONPrem)
-    B(Tier1 Cluster)<-- skupperlink -->C(Tier2 Cluster)
-    C(Tier2 Cluster)<-- skupperlink -->D(Tier3 Cluster)
+    B(Tier1 Cluster)<--<-- skupperlink -->A(ONPrem)
+    B(Tier1 Cluster)<--<-- skupperlink -->C(Tier2 Cluster)
+    C(Tier2 Cluster)<--<-- skupperlink -->D(Tier3 Cluster)
 
 ```
 ## Application migration
@@ -192,7 +192,7 @@ resources:
    
     ```
     ```
-    export kubeconfig=~/tier3-cluster
+    export KUBECONFIG=~/tier3-cluster
     kubectl apply -k .
     service/emailservice created
     service/paymentservice created
@@ -213,11 +213,13 @@ resources:
 
    ```
    skupper expose deployment paymentservice
+
    deployment paymentservice exposed as paymentservice
    ```
    
    ```
    skupper expose deployment emailservice
+
    deployment emailservice exposed as emailservice
    ```
 
@@ -225,7 +227,7 @@ resources:
 
 1. The middleware services we are deploying now will interact with payments and email service using the service names but they are not available here because the skupper is deployed with service sync disabled. We have to create them manually using the commands below.
    ```
-   export kubeconfig=~/tier2-cluster
+   export KUBECONFIG=~/tier2-cluster
    ```
   ```
   skupper service create paymentservice --protocol tcp 50051
@@ -304,7 +306,7 @@ resources:
 
 1. Like we did in tier2 cluster, all the middleware services deployed in tier2 cluster will not be visible to frontend cluster, Hence we will create them using the skupper cli.
   ```
-  export kubeconfig=~/tier1-cluster
+  export KUBECONFIG=~/tier1-cluster
   ```
   ```
   skupper service create adservice --protocol tcp 9555
@@ -346,13 +348,16 @@ resources:
     skupper-router-6548887ddf-mpscl              2/2     Running   0          5h13m
     skupper-service-controller-9c66bf75f-4ffc4   2/2     Running   0          5h13m
     ```
+    ```
+    skupper expose deployment frontend
+    ```
 
     ### ONPrem cluster
 
     1. expose frontend via skupper
 
   ```
-  export kubeconfig=~/tier1-cluster
+  export KUBECONFIG=~/tier1-cluster
   ```
   ```
   skupper expose deployment frontend
