@@ -73,7 +73,7 @@ Tier 3: **Copy the token and create a link using it.**
 skupper link create ~/tier2.token
 ```
 
-These should be the resulting outputs of skupper link status in each of the clusters
+These should be the resulting outputs of `skupper link status` in each of the clusters
 
 *Tier 1*
 
@@ -217,7 +217,11 @@ Visit the frontend URL from the base namespace and perform actions like adding i
 
 From here, you should be able to go and Add to Cart and Place an Order.
 
-*** Enter Image
+### Screenshots
+
+| Home Page                                                                                                         | Checkout Screen                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| [![Screenshot of boutique-landing](/docs/img/boutique-landing.png)](/docs/img/boutique-landing.png) | [![Screenshot of checkout screen](/docs/img/placed-order.png)](/docs/img/placed-order.png) |
 
 ### Step 8: Migrate Frontend Service
 Prepare for the migration of the frontend service to another namespace within the same cluster. We don’t intend to decomm the route; however, from the original base namespace. The external LB will continue to serve traffic to this namespace to the route.
@@ -235,6 +239,21 @@ oc apply -k overlays/tier1
 ```
 
 Follow the same steps as for other clusters (Steps 3, 4 & 6): initialize Skupper, create tokens and links, deploy frontend service via kustomize, and expose it via Skupper.
+
+You should now have two connected namespaces will you run `skupper link status` from the original base namespace.
+
+```
+$ skupper link status
+
+Links created from this site:
+
+	 There are no links configured or connected
+
+Current links from other sites that are connected:
+
+	 Incoming link from site 9f5e5d3c-2a65-4fa0-ad3d-01ad389f58e2 on namespace ${TIER1_FRONTEND_NS}
+	 Incoming link from site 78884fa3-f77e-48e2-85f6-e1d920edf8c6 on namespace ${TIER2_NS}
+```
 
 We’re now going to effectively decomm the base namespace. Scale down all microservices in the original ‘base’ namespace to 0 replicas. We also don’t want to scale down the loadgenerator running in the background!
 
