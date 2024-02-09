@@ -153,6 +153,7 @@ skupper init --enable-flow-collector --enable-console --enable-service-sync=fals
 3. **TOKENS** are exchanged between sites to Trust and establish **LINKS**
 4. **TOKENS** can be generated on any site and exchanged with other sites to establish **LINKS**
 5. LINK are UNI-DIRECTIONAL but the exchange of data between sites is  BI-DIRECTIONAL. 
+6. As a best practise, Always establish link from a MOST TRUSTED ZONE/CLUSTER to a LESSER TRUESTED ZONE/CLUSTER. In our example Tier3 cluster is the most trusted, so the link originates from here.
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph LR
