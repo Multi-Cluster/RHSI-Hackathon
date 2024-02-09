@@ -221,7 +221,7 @@ From here, you should be able to go and Add to Cart and Place an Order.
 
 | Home Page                                                                                                         | Checkout Screen                                                                                                    |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| [![Screenshot of boutique-landing](/docs/img/boutique-landing.png)](/docs/img/boutique-landing.png) | [![Screenshot of checkout screen](/docs/img/placed-order.png)](/docs/img/placed-order.png) |
+| [![Screenshot of boutique-landing](/docs/img/boutique_landing.png)](/docs/img/boutique_landing.png) | [![Screenshot of checkout screen](/docs/img/placed_order.png)](/docs/img/placed_order.png) |
 
 ### Step 8: Migrate Frontend Service
 Prepare for the migration of the frontend service to another namespace within the same cluster. We don’t intend to decomm the route; however, from the original base namespace. The external LB will continue to serve traffic to this namespace to the route.
