@@ -5,13 +5,13 @@ This page contains instructions on deploying variations of the [Online Boutique]
 
 ## Deploy Online Boutique with Kustomize
 
-1. From the root folder of this repository, navigate to the `Openshift/` directory.
+1. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory.
 
     ```bash
     cd Openshift/
     ```
 
-2. Apply the templates under (`Openshift/`).
+2. Apply the templates under (`online-boutique/Openshift/`).
 
     ```bash
     oc apply -f . --recursive
