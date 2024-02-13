@@ -12,7 +12,7 @@ The scenario involves three clusters where ALL services are visible to each othe
 
 The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
 
-| Initiative                           | Documentation Link                                    |
+| Topic                               | Documentation Link                                    |
 |-------------------------------------|-------------------------------------------------------|
 | Install Skupper                     | [Documentation](https://skupper.io/install/index.html) |
 | Working with Tokens                 | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
