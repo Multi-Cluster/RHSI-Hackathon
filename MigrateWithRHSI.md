@@ -2,6 +2,7 @@
 
 - [Migratate the online boutique to different openshift clusters](#migratate-the-online-boutique-to-different-openshift-clusters)
   - [Pre-requisites](#pre-requisites)
+  - [Clone the code base](#clone-the-code-base)
   - [current state](#current-state)
   - [End state](#end-state)
   - [Migration Steps](#migration-steps)
@@ -26,6 +27,15 @@
    1. Skupper cli - Download it [**here**](https://skupper.io/releases/index.html)
    2. oc cli Download it [**here**](http://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.14.0/openshift-client-linux-4.14.0.tar.gz)
    3. Access to openshift clusters 
+   
+
+## Clone the code base
+
+Code for deploying the online boutique is in [this](https://github.com/Multi-Cluster/RHSI-Hackathon) git repo
+```
+git clone https://github.com/Multi-Cluster/RHSI-Hackathon.git
+
+```
    
 
 ## current state
