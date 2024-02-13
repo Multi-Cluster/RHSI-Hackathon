@@ -8,7 +8,7 @@ This page contains instructions on deploying variations of the [Online Boutique]
 1. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory.
 
     ```bash
-    cd Openshift/
+    cd online-boutique/Openshift/
     ```
 
 2. Apply the templates under (`online-boutique/Openshift/`).
