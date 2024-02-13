@@ -9,7 +9,7 @@ Requirements:
 1. Zero service disruption throughout the migration (outages will be monitored for)
 2. Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1-s1 for Tier1 Cluster etc.)
 3. No changes to the application code and/or K8s manifests
-4. Deploy to three clusters where ALL services are visible to each other (**HINT:** cast your eyes to the `service-sync-enabled` flag)
+4. Deploy to three clusters where ALL services are visible to each other (**HINT:** cast your eyes to the `service-sync-enabled` flag as part of the `skupper` CLI)
 5. Maintain the `frontend` route should still remain in the on-prem namespace
 
 The objective is to progressively migrate microservices to different cloud VPCs while maintaining functionality. 
