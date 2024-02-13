@@ -36,6 +36,8 @@ Requirements:
 
 1. Update your Route 53 hosted zone with a CNAME record to point to the Frontend route
 
+## Documentation
+
 The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
 
 | Topic                               | Documentation Link                                    |
@@ -46,11 +48,9 @@ The following documentation matrix will lead you to important information to ach
 | Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
 
 
-## Use Online Boutique
+## Deploying Online Boutique
 
-This page contains instructions on deploying variations of the [Online Boutique]
-
-### Deploy Online Boutique with Kustomize
+This section contains instructions on deploying the [Online Boutique].
 
 1. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory.
 
