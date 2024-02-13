@@ -21,7 +21,7 @@ Now both functionality and **security** are of importance to the hybrid architec
 Requirements:
 
 1. Zero service disruption throughout the migration (outages will be monitored for)
-2. Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1-s1 for Tier1 Cluster etc.)
+2. Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1-s2 for Tier1 Cluster etc.)
 3. No changes to the application code and/or K8s manifests
 4. Deploy to three clusters with restricted visibility of services, following a trust relationship where:
 
