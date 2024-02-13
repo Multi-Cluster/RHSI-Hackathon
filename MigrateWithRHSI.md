@@ -255,29 +255,16 @@ graph LR
 
 ### **Tier3 cluster**
 
-1. starting with the most restricted applications first. payments and email service should go onto payments namespace in tier3 cluster.
-
-Update `kustomize/kustomization.yaml` to deploy only payments. the file should like below.
-
-```
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-# - frontend
-# - middleware
- - payments
-# - loadgenerator
-
-```
-2. From the root folder of this repository, navigate to the `online-boutique/kustomize/` directory and apply the mainfests.
+1. starting with the most restricted applications first. payments and email service should go onto payments namespace in tier3 cluster. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory and apply the mainfests.
 
     ```bash
-    cd online-boutique/kustomize/
-   
-    ```
-    ```
+    cd online-boutique/Openshift/
     export KUBECONFIG=~/tier3-cluster
-    kubectl apply -k .
+    oc apply -f payments
+    ```
+
+    ```
+
     service/emailservice created
     service/paymentservice created
     deployment.apps/emailservice created
@@ -292,7 +279,7 @@ resources:
     skupper-service-controller-9c66bf75f-4ffc4   2/2     Running   0          4h13m
     ```
 
-3. expose the payment and email services via skupper.
+2. expose the payment and email services via skupper.
    
 
    ```
@@ -320,26 +307,16 @@ resources:
 
   ```
 
-2. Update `kustomize/kustomization.yaml` to deploy only middleware. the file should like below.
-
-```
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-# - frontend
- - middleware
-# - payments
-# - loadgenerator
-
-```
-3. From the root folder of this repository, navigate to the `online-boutique/kustomize/` directory and apply the mainfests.
+2. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory and apply the mainfests.
 
     ```bash
-    cd online-boutique/kustomize/
+    cd online-boutique/Openshift/
    
     ```
     ```
-    kubectl apply -k .
+    oc apply -f middleware
+    ```
+    ```
     service/adservice created
     service/cartservice created
     service/checkoutservice created
@@ -359,6 +336,8 @@ resources:
     ```
     ```
     $oc get pods
+    ```
+    ```
     NAME                                         READY   STATUS    RESTARTS   AGE
     adservice-68448666d6-skvb2                   1/1     Running   0          34s
     cartservice-5fdd4bf56f-5vd5c                 1/1     Running   0          33s
@@ -373,9 +352,11 @@ resources:
     skupper-service-controller-9c66bf75f-4ffc4   2/2     Running   0          5h4m
     ```
   
-4. Expose all the services deployed via skupper
+2. Expose all the services deployed via skupper
   ```
   $for i in adservice cartservice checkoutservice currencyservice productcatalogservice recommendationservice redis-cart shippingservice; do skupper expose deployment $i; done
+  ```
+  ```
   deployment adservice exposed as adservice
   deployment cartservice exposed as cartservice
   deployment checkoutservice exposed as checkoutservice
@@ -403,29 +384,21 @@ resources:
   skupper service create currencyservice --protocol tcp 7000
   ```
 
-2. Deploy Front end using kustomize. 2. Update `kustomize/kustomization.yaml` to deploy only frontend. the file should like below.
-
-```
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
- - frontend
-# - middleware
-# - payments
-# - loadgenerator
-
-```
-3. From the root folder of this repository, navigate to the `online-boutique/kustomize/` directory and apply the mainfests.
+2.  From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory and apply the mainfests.
 
     ```bash
-    cd online-boutique/kustomize/
-    kubectl apply -k .
+    cd online-boutique/Openshift/
+    oc apply -f frontend 
+    ```
+    ```
     service/frontend created
     deployment.apps/frontend created
     route.route.openshift.io/frontend created
     ```
     ```
     $oc get pods
+    ```
+    ```
     NAME                                         READY   STATUS    RESTARTS   AGE
     frontend-7b65d55cbd-ff5ws                    1/1     Running   0          48s
     skupper-prometheus-59db49845c-xzrdr          1/1     Running   0          5h13m
@@ -441,7 +414,7 @@ resources:
     1. expose frontend via skupper
 
   ```
-  export KUBECONFIG=~/tier1-cluster
+  export KUBECONFIG=~/onprem-cluster
   ```
   ```
   skupper expose deployment frontend
