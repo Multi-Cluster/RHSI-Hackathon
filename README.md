@@ -2,13 +2,39 @@
 
 Baker's Bargain Barn online retail website requires restructuring its architecture for scalability and security. The migration must ensure ZERO SERVICE DISRUPTION and refrain from altering application code or design. The frontend service relocates to Tier1 Cluster, while Payments and Email services migrate to the most secure cluster (Tier3). The remainder of the microservices should be destined for the Tier2 cluster. 
 
+## Scenario 1 
+
 Requirements:
 
-- Zero service disruption throughout the migration (outages will be monitored for)
-- Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1 for Tier1 Cluster etc.)
-- No changes to the application code and/or K8s manifests
+1. Zero service disruption throughout the migration (outages will be monitored for)
+2. Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1-s1 for Tier1 Cluster etc.)
+3. No changes to the application code and/or K8s manifests
+4. Deploy to three clusters where ALL services are visible to each other (**HINT:** cast your eyes to the `service-sync-enabled` flag)
+5. Maintain the `frontend` route should still remain in the on-prem namespace
 
-The scenario involves three clusters where ALL services are visible to each other. The objective is to progressively migrate microservices to different cloud VPCs while maintaining functionality. 
+The objective is to progressively migrate microservices to different cloud VPCs while maintaining functionality. 
+
+## Scenario 2
+
+Now both functionality and **security** are of importance to the hybrid architecture of your Online Boutique. 
+
+Requirements:
+
+1. Zero service disruption throughout the migration (outages will be monitored for)
+2. Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1-s1 for Tier1 Cluster etc.)
+3. No changes to the application code and/or K8s manifests
+4. Deploy to three clusters with restricted visibility of services, following a trust relationship where:
+
+   - Tier2 trusts Tier1
+   - Tier3 trusts Tier2
+  
+5. Migrate the route to the Tier1 namespace (i.e. both the workload and the route should now reside in the same namespace).
+
+## Scenario 3 (BONUS)
+
+Requirements:
+
+1. Update your Route 53 hosted zone with a CNAME record to point to the Frontend route
 
 The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
 
