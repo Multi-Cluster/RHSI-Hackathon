@@ -32,6 +32,8 @@ Requirements:
 
 ## Scenario 3 (BONUS)
 
+DO NOT DELETE what you've created in Scenario 2. This is an extension of that scenario's end product.
+
 Requirements:
 
 1. Update your Route 53 hosted zone with a CNAME record to point to the Frontend route
