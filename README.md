@@ -1,9 +1,30 @@
-# Use Online Boutique with Kustomize
+# Red Hat Service Interconnect - February APAC Hackathon
+
+Baker's Bargain Barn online retail website requires restructuring its architecture for scalability and security. The migration must ensure ZERO SERVICE DISRUPTION and refrain from altering application code or design. The frontend service relocates to Tier1 Cluster, while Payments and Email services migrate to the most secure cluster (Tier3). The remainder of the microservices should be destined for the Tier2 cluster. 
+
+Requirements:
+
+- Zero service disruption throughout the migration (outages will be monitored for)
+- Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1 for Tier1 Cluster etc.)
+- No changes to the application code and/or K8s manifests
+
+The scenario involves three clusters where ALL services are visible to each other. The objective is to progressively migrate microservices to different cloud VPCs while maintaining functionality. 
+
+The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
+
+| Initiative                           | Documentation Link                                    |
+|-------------------------------------|-------------------------------------------------------|
+| Install Skupper                     | [Documentation](https://skupper.io/install/index.html) |
+| Working with Tokens                 | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
+| Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html) |
+| Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
+
+
+## Use Online Boutique
 
 This page contains instructions on deploying variations of the [Online Boutique]
 
-
-## Deploy Online Boutique with Kustomize
+### Deploy Online Boutique with Kustomize
 
 1. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory.
 
@@ -47,4 +68,3 @@ This page contains instructions on deploying variations of the [Online Boutique]
     ```bash
     oc get route frontend -o jsonpath='{.spec.host}'
     ```
-
