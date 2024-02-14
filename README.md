@@ -22,10 +22,26 @@ shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
 ```
 
 ### Step 2: Access Tiered OpenShift Clusters
-Login to the Tier 2 and Tier 3 OpenShift (OCP) clusters hosted in the cloud. Each cluster has distinct services allocated to it:
+Login to the Tier 2 and Tier 3 OpenShift (OCP) clusters hosted in the cloud. Each services is destined for either the Tier 2 or 3 cluster:
 
 * **Tier 2 Cluster**: Cart, Product Catalog, Currency, Shipping, Checkout, Recommendation, Ad, and Redis cache.
 * **Tier 3 Cluster**: Payment and Email services.
+
+### Step 3: Create the namespaces
+
+Create the following namespaces in each of the above clusters as per the set naming convention.
+
+*Tier 2*
+
+```
+oc new-project teamname-tier2-s1
+```
+
+*Tier 3*
+
+```
+oc new-project teamname-tier3-s1
+```
 
 ### Step 3: Skupper Initialization
 Initialize Skupper in all clusters, including the on-premises one. Execute the following command:
@@ -37,22 +53,22 @@ skupper init --enable-console --enable-flow-collector
 This command will deploy a single instance each of the Skupper router, service-controller, and Prometheus.
 
 ### Step 4: Mesh Generation
-Create the mesh to establish peer networks between the clusters. We'll create two peer networks where Tier 1 will trust Tier 2, and Tier 3 will trust Tier 2.
+Create the mesh to establish peer networks between the clusters. We'll create two peer networks where On-Prem will trust Tier 2, and Tier 3 will trust Tier 2.
 
-Since Service Sync is enabled, a transitional trust relationship will exist between Tier 1 and Tier 3 clusters, ensuring that all services exposed via Skupper will be visible in each cluster/namespace.
+Since Service Sync is enabled, a transitional trust relationship will exist between On-Prem and Tier 3 clusters, ensuring that all services exposed via Skupper will be visible in each cluster/namespace.
 
 #### Commands:
 
-Tier 1: **Generate a token**.
+On-Prem: **Generate a token**.
 
 ```
-skupper token create ~/tier1.token
+skupper token create ~/onprem.token
 ```
 
 Tier 2: **Copy the token and create a link using it.**
 
 ```
-skupper link create ~/tier1.token
+skupper link create ~/onprem.token
 ```
 
 Tier 2: **Generate a token.**
@@ -124,23 +140,23 @@ Current links from other sites that are connected:
 ```
 
 ### Step 5: Deploy Microservices
-Ensure that Tier 2 and Tier 3 namespaces are devoid of microservices.
+Ensure that Tier 2 and Tier 3 namespaces are devoid of microservices by running `oc get pod`. Everything should be bare.
 Clone the Online Boutique microservices demo repository into the Tier 2 and 3 clusters:
 
 ```
-git clone -b kustomize-rejig https://github.com/Multi-Cluster/RHSI-Hackathon.git --single-branch
+git clone https://github.com/Multi-Cluster/RHSI-Hackathon.git
 ```
 
 Navigate to the kustomize directory:
 
 ```
-cd RHSI-Hackathon/online-boutique/kustomize
+cd RHSI-Hackathon/online-boutique/Openshift
 ```
 
 Apply the overlays dir applicable to the Tier 2 cluster:
 
 ```
-oc apply -k overlays/tier2
+oc apply -f middleware --recursive
 ```
 
 Verify that the pods are deployed in the Tier 2 cluster:
@@ -164,7 +180,7 @@ skupper-service-controller-856db7d6c7-bf7jj   2/2     Running   0          17h
 Repeat the same for Tier 3.
 
 ```
-$ oc apply -k overlays/tier3
+$ oc apply -f payments --recursive
 service/emailservice created
 service/paymentservice created
 deployment.apps/emailservice created
@@ -186,10 +202,23 @@ skupper-service-controller-5c8db58cb5-sglfc   2/2     Running   0          17
 ### Step 6: Expose Services via Skupper
 Expose each microservice deployment in its respective namespace/cluster using Skupper.
 
-Example for Tier 3 namespace:
+Tier 2 namespace:
 
 ```
-skupper expose deployment emailservice 
+skupper expose deployment adservice && \
+skupper expose deployment cartservice && \
+skupper expose deployment checkoutservice && \
+skupper expose deployment currencyservice && \
+skupper expose deployment productcatalogservice && \
+skupper expose deployment recommendationservice && \
+skupper expose deployment redis-cart && \
+skupper expose deployment shippingservice
+```
+
+Tier 3 namespace:
+
+```
+skupper expose deployment emailservice && \
 skupper expose deployment paymentservice
 ```
 
@@ -207,7 +236,24 @@ $ oc get svc emailservice -o yaml | grep selector -A 4
 ### Step 7: Verify Mesh Spanning
 Ensure that the microservice mesh spans across all three clusters. You should just be able to run oc get svc from any cluster/namespace and see all of them visible.
 
-Visit the frontend URL from the base namespace and perform actions like adding items to the cart and making payments to verify functionality. 
+We’re now going to effectively decomm the On-Prem namespace. Expose the frontend service in the On-Prem namespace and scale down all microservices in the original On-Prem namespace to 0 replicas. We don’t however want to scale down the loadgenerator or frontend running in the background!
+
+```
+export TEAMNAME_ONPREM_NS="teamname-onprem" && \
+skupper expose deployment frontend -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment adservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment cartservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment checkoutservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment currencyservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment emailservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment paymentservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment productcatalogservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment recommendationservice -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment redis-cart -n ${TEAMNAME_ONPREM_NS} && \
+oc scale --replicas=0 deployment shippingservice -n ${TEAMNAME_ONPREM_NS}
+```
+
+Visit the frontend URL from the On-Prem namespace and perform actions like adding items to the cart and making payments to verify functionality. 
 
 From here, you should be able to go and Add to Cart and Place an Order.
 
@@ -218,21 +264,26 @@ From here, you should be able to go and Add to Cart and Place an Order.
 | [![Screenshot of boutique-landing](/docs/img/boutique_landing.png)](/docs/img/boutique_landing.png) | [![Screenshot of checkout screen](/docs/img/placed_order.png)](/docs/img/placed_order.png) |
 
 ### Step 8: Migrate Frontend Service
-Prepare for the migration of the frontend service to another namespace within the same cluster. We don’t intend to decomm the route; however, from the original base namespace. The external LB will continue to serve traffic to this namespace to the route.
+Prepare for the migration of the frontend service to another namespace within the SAME (on-prem) cluster. 
+**NOTE**:  While the conceptual idea involves deploying to another cluster, the practical implementation will utilize another namespace named tier1.
 
-Create the new namespace called ‘frontend’
+We don’t intend to decomm the route; however, from the original base namespace. The external LB will continue to serve traffic to this namespace to the route.
+
+Create the new Tier1 namespace.
 
 ```
-oc new-project will-frontend
+oc new-project teamname-tier1-s1
 ```
 
 Deploy the frontend via kustomize
 
 ```
-oc apply -k overlays/tier1
+oc apply -f frontend --recursive
 ```
 
 Follow the same steps as for other clusters (Steps 3, 4 & 6): initialize Skupper, create tokens and links, deploy frontend service via kustomize, and expose it via Skupper.
+
+For the link connection we want to create the token in On-Prem, and create the link from the Tier1 namespace.
 
 You should now have two connected namespaces will you run `skupper link status` from the original base namespace.
 
@@ -249,14 +300,13 @@ Current links from other sites that are connected:
 	 Incoming link from site 78884fa3-f77e-48e2-85f6-e1d920edf8c6 on namespace ${TIER2_NS}
 ```
 
-We’re now going to effectively decomm the base namespace. Scale down all microservices in the original ‘base’ namespace to 0 replicas. We also don’t want to scale down the loadgenerator running in the background!
+Now we want to expose the frontend service in the Tier 1 namespace via Skupper and then finish off our decommissioning activities in the On-Prem namespace by scaling down the originating `frontend` workload.
 
 ```
-oc scale --replicas=0 deployment -n will-base --selector='!skupper.io/component,!app=loadgenerator'
+export TEAMNAME_ONPREM_NS="teamname-onprem" && \
+export TEAMNAME_TIER1_NS="teamname-tier1-s1" && \
+skupper expose deployment frontend -n ${TEAMNAME_TIER1_NS} && \
+oc scale --replicas=0 deployment frontend -n ${TEAMNAME_ONPREM_NS} 
 ```
 
-Finally, update the original route to reflect the changes:
-
-```
-oc patch route frontend -n ${NAMESPACE} --type='json' -p='[{"op": "replace", "path": "/spec/port/targetPort", "value": "'$(oc get svc frontend -o=jsonpath='{.spec.ports[0].name}')'"}]'
-```
+You should now be able to visit the original Frontend route and verify its operation.
