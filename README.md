@@ -11,13 +11,19 @@ This page contains instructions on deploying variations of the [Online Boutique]
     cd online-boutique/Openshift/
     ```
 
-2. Apply the templates under (`online-boutique/Openshift/`).
+2. Login to the on-prem cluster and create your namespace as per the advised naming convention.
+
+```bash
+    oc new-project teamname-onprem
+    ```
+   
+3. Apply the templates under (`online-boutique/Openshift/`).
 
     ```bash
     oc apply -f . --recursive
     ```
 
-3. Wait for all Pods to show `STATUS` of `Running`.
+4. Wait for all Pods to show `STATUS` of `Running`.
 
     ```bash
     oc get pods
@@ -42,7 +48,7 @@ This page contains instructions on deploying variations of the [Online Boutique]
 
     _Note: It may take 2-3 minutes before the changes are reflected on the deployment._
 
-4. Access the web frontend in a browser using the frontend's `Route`.
+5. Access the web frontend in a browser using the frontend's `Route`.
 
     ```bash
     oc get route frontend -o jsonpath='{.spec.host}'
