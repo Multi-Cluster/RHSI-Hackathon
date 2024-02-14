@@ -3,7 +3,7 @@
 ## Scenario 1 - Service Sync ENABLED
 
 ### Step 1: Inventory of Existing Pods
-Begin by assessing the pods deployed within the designated namespace, base, in the on-premises cluster. The following pods are currently set up:
+Begin by assessing the pods deployed within the designated namespace in the on-premises cluster. The following pods are currently set up:
 
 ```
 NAME                                     READY   STATUS    RESTARTS   AGE
@@ -43,7 +43,7 @@ oc new-project teamname-tier2-s1
 oc new-project teamname-tier3-s1
 ```
 
-### Step 3: Skupper Initialization
+### Step 4: Skupper Initialization
 Initialize Skupper in all clusters, including the on-premises one. Execute the following command:
 
 ```
@@ -52,7 +52,7 @@ skupper init --enable-console --enable-flow-collector
 
 This command will deploy a single instance each of the Skupper router, service-controller, and Prometheus.
 
-### Step 4: Mesh Generation
+### Step 5: Mesh Generation
 Create the mesh to establish peer networks between the clusters. We'll create two peer networks where On-Prem will trust Tier 2, and Tier 3 will trust Tier 2.
 
 Since Service Sync is enabled, a transitional trust relationship will exist between On-Prem and Tier 3 clusters, ensuring that all services exposed via Skupper will be visible in each cluster/namespace.
@@ -139,7 +139,7 @@ Current links from other sites that are connected:
 	 There are no connected links
 ```
 
-### Step 5: Deploy Microservices
+### Step 6: Deploy Microservices
 Ensure that Tier 2 and Tier 3 namespaces are devoid of microservices by running `oc get pod`. Everything should be bare.
 Clone the Online Boutique microservices demo repository into the Tier 2 and 3 clusters:
 
@@ -199,7 +199,7 @@ skupper-router-f94cff94d-hmkx5                2/2     Running   0          17h
 skupper-service-controller-5c8db58cb5-sglfc   2/2     Running   0          17
 ```
 
-### Step 6: Expose Services via Skupper
+### Step 7: Expose Services via Skupper
 Expose each microservice deployment in its respective namespace/cluster using Skupper.
 
 Tier 2 namespace:
@@ -233,7 +233,7 @@ $ oc get svc emailservice -o yaml | grep selector -A 4
   type: ClusterIP
 ```
 
-### Step 7: Verify Mesh Spanning
+### Step 8: Verify Mesh Spanning
 Ensure that the microservice mesh spans across all three clusters. You should just be able to run oc get svc from any cluster/namespace and see all of them visible.
 
 We’re now going to effectively decomm the On-Prem namespace. Expose the frontend service in the On-Prem namespace and scale down all microservices in the original On-Prem namespace to 0 replicas. We don’t however want to scale down the loadgenerator or frontend running in the background!
@@ -263,13 +263,14 @@ From here, you should be able to go and Add to Cart and Place an Order.
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [![Screenshot of boutique-landing](/docs/img/boutique_landing.png)](/docs/img/boutique_landing.png) | [![Screenshot of checkout screen](/docs/img/placed_order.png)](/docs/img/placed_order.png) |
 
-### Step 8: Migrate Frontend Service
+### Step 9: Migrate Frontend Service
 Prepare for the migration of the frontend service to another namespace within the SAME (on-prem) cluster. 
-**NOTE**:  While the conceptual idea involves deploying to another cluster, the practical implementation will utilize another namespace named tier1.
 
-We don’t intend to decomm the route; however, from the original base namespace. The external LB will continue to serve traffic to this namespace to the route.
+**NOTE**:  While the conceptual idea involves deploying to another cluster, the practical implementation will utilize another namespace named `tier1`.
 
-Create the new Tier1 namespace.
+We don’t intend to decommission the route; however, from the original ON-PREM namespace. The external LB will continue to serve traffic to this namespace to the route.
+
+Create the new Tier 1 namespace.
 
 ```
 oc new-project teamname-tier1-s1
@@ -281,11 +282,11 @@ Deploy the frontend via kustomize
 oc apply -f frontend --recursive
 ```
 
-Follow the same steps as for other clusters (Steps 3, 4 & 6): initialize Skupper, create tokens and links, deploy frontend service via kustomize, and expose it via Skupper.
+Follow the same steps as for other clusters (Steps 4 & 5): initialize Skupper in addition to creating tokens and links.
 
-For the link connection we want to create the token in On-Prem, and create the link from the Tier1 namespace.
+For the link connection we want to create the token in On-Prem, and create the link from the Tier 1 namespace.
 
-You should now have two connected namespaces will you run `skupper link status` from the original base namespace.
+You should now have two connected namespaces will you run `skupper link status` from the original On Prem namespace.
 
 ```
 $ skupper link status
