@@ -13,7 +13,7 @@ This page contains instructions on deploying variations of the [Online Boutique]
 
 2. Login to the on-prem cluster and create your namespace as per the advised naming convention.
 
-```bash
+    ```bash
     oc new-project teamname-onprem
     ```
    
