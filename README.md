@@ -2,13 +2,7 @@
 
 ### Scenario 1 - Service Sync ENABLED
 
-As Baker's Bargain Barn embarks on the journey of migrating to the cloud, we recognize that our long-term business agility depends on this transition. One critical aspect of this migration involves our Online Boutique application. It's imperative that we achieve zero downtime during this process to ensure seamless operation for our users.
-
-As you participate in this hackathon, remember that your primary goal is to migrate our Online Boutique microservice, spanning three clusters seamlessly - with ZERO DOWNTIME as you migrate! To aid in this endeavor, we'll be utilizing Skupper, a powerful tool for interconnecting services across Kubernetes clusters.
-
-As a side note, we’ll be leveraging Locust, a powerful load testing engine, to monitor each team's application in the background. Locust will diligently observe for any deviations, particularly focusing on errors of the 400/500 type. It's imperative for each team participating in the hackathon to prioritize mitigating these errors to maintain a smooth user experience and avoid penalties to their overall score.
-
-### Step 1: Inventory of Existing Pods
+#### Step 1: Inventory of Existing Pods
 Begin by assessing the pods deployed within the designated namespace, base, in the on-premises cluster. The following pods are currently set up:
 
 ```
@@ -27,13 +21,13 @@ redis-cart-5f59546cdd-5jnqf              1/1     Running   0          2m58s
 shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
 ```
 
-### Step 2: Access Tiered OpenShift Clusters
+#### Step 2: Access Tiered OpenShift Clusters
 Login to the Tier 2 and Tier 3 OpenShift (OCP) clusters hosted in the cloud. Each cluster has distinct services allocated to it:
 
-* Tier 2 Cluster: Cart, Product Catalog, Currency, Shipping, Checkout, Recommendation, Ad, and Redis cache.
-* Tier 3 Cluster: Payment and Email services.
+* **Tier 2 Cluster**: Cart, Product Catalog, Currency, Shipping, Checkout, Recommendation, Ad, and Redis cache.
+* **Tier 3 Cluster**: Payment and Email services.
 
-### Step 3: Skupper Initialization
+#### Step 3: Skupper Initialization
 Initialize Skupper in all clusters, including the on-premises one. Execute the following command:
 
 ```
@@ -42,12 +36,12 @@ skupper init --enable-console --enable-flow-collector
 
 This command will deploy a single instance each of the Skupper router, service-controller, and Prometheus.
 
-### Step 4: Mesh Generation
+#### Step 4: Mesh Generation
 Create the mesh to establish peer networks between the clusters. We'll create two peer networks where Tier 1 will trust Tier 2, and Tier 3 will trust Tier 2.
 
 Since Service Sync is enabled, a transitional trust relationship will exist between Tier 1 and Tier 3 clusters, ensuring that all services exposed via Skupper will be visible in each cluster/namespace.
 
-#### Commands:
+##### Commands:
 
 Tier 1: **Generate a token**.
 
@@ -129,7 +123,7 @@ Current links from other sites that are connected:
 	 There are no connected links
 ```
 
-### Step 5: Deploy Microservices
+#### Step 5: Deploy Microservices
 Ensure that Tier 2 and Tier 3 namespaces are devoid of microservices.
 Clone the Online Boutique microservices demo repository into the Tier 2 and 3 clusters:
 
@@ -189,7 +183,7 @@ skupper-router-f94cff94d-hmkx5                2/2     Running   0          17h
 skupper-service-controller-5c8db58cb5-sglfc   2/2     Running   0          17
 ```
 
-### Step 6: Expose Services via Skupper
+#### Step 6: Expose Services via Skupper
 Expose each microservice deployment in its respective namespace/cluster using Skupper.
 
 Example for Tier 3 namespace:
@@ -210,20 +204,20 @@ $ oc get svc emailservice -o yaml | grep selector -A 4
   type: ClusterIP
 ```
 
-### Step 7: Verify Mesh Spanning
+#### Step 7: Verify Mesh Spanning
 Ensure that the microservice mesh spans across all three clusters. You should just be able to run oc get svc from any cluster/namespace and see all of them visible.
 
 Visit the frontend URL from the base namespace and perform actions like adding items to the cart and making payments to verify functionality. 
 
 From here, you should be able to go and Add to Cart and Place an Order.
 
-### Screenshots
+#### Screenshots
 
 | Home Page                                                                                                         | Checkout Screen                                                                                                    |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [![Screenshot of boutique-landing](/docs/img/boutique_landing.png)](/docs/img/boutique_landing.png) | [![Screenshot of checkout screen](/docs/img/placed_order.png)](/docs/img/placed_order.png) |
 
-### Step 8: Migrate Frontend Service
+#### Step 8: Migrate Frontend Service
 Prepare for the migration of the frontend service to another namespace within the same cluster. We don’t intend to decomm the route; however, from the original base namespace. The external LB will continue to serve traffic to this namespace to the route.
 
 Create the new namespace called ‘frontend’
