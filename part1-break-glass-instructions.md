@@ -6,7 +6,7 @@
 Begin by reviewing the deployment that was provided for you.
 
 Replace ``<your-team>`` with the team name provided by your facilitator.  
-Using the  project ```<yourteam>-base-s1``` on the ```on-prem``` cluster, get all the pods.
+Using the  project ```<your-team>-base-s1``` on the ```on-prem``` cluster, get all the pods.
 
 ```
 oc login -u <your-team> <cluster url>
