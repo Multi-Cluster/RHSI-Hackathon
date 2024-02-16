@@ -6,12 +6,12 @@
 Begin by reviewing the deployment that was provided for you.
 
 Replace ``<your-team>`` with the team name provided by your facilitator.  
-Using the  project ```<yourteam>-full-s1``` on the ```on-prem``` cluster, get all the pods.
+Using the  project ```<yourteam>-base-s1``` on the ```on-prem``` cluster, get all the pods.
 
 ```
 oc login -u <your-team> <cluster url>
 
-oc project <yourteam>-full-s1
+oc project <yourteam>-base-s1
 
 oc get pods
 
@@ -39,7 +39,7 @@ Get the route so you can access the application via the route. Note that it is H
 ```
 oc get routes
 ```
-E.g. http://frontend-team1-full-s1.apps.cluster-2txjp.2txjp.sandbox2634.opentlc.com  
+E.g. http://frontend-team1-base-s1.apps.cluster-2txjp.2txjp.sandbox2634.opentlc.com  
 
 ## Step 2: Access the Three Target OpenShift Clusters
 
@@ -71,7 +71,7 @@ oc new-project <your-team>-tier1-s1
 ## Step 4: Skupper Initialisation
 Once you have created each project, install Service Interconnect.
 
-#### On Premises (Full Application)
+#### On Premises (Base Application)
 ```
 skupper init --site-name on-prem --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password
 ```
@@ -178,8 +178,8 @@ You can also view the network topology from the command line:
 $ skupper network status
 
 Sites:
-├─ [local] 132f381b-aa11-440c-a0e1-eb2300050096(bryon-full-s1) 
-│  │ namespace: bryon-full-s1
+├─ [local] 132f381b-aa11-440c-a0e1-eb2300050096(bryon-base-s1) 
+│  │ namespace: bryon-base-s1
 │  │ site name: on-prem
 │  │ version: 1.5.3
 │  ╰─ Linked sites:
@@ -192,7 +192,7 @@ Sites:
 │  ╰─ Linked sites:
 │     ├─ 3fee8ed7-2f0e-4632-bc50-194952d1aae9(bryon-tier2)
 │     │  direction: outgoing
-│     ╰─ 132f381b-aa11-440c-a0e1-eb2300050096(bryon-full-s1)
+│     ╰─ 132f381b-aa11-440c-a0e1-eb2300050096(bryon-base-s1)
 │        direction: incoming
 ├─ [remote] 3fee8ed7-2f0e-4632-bc50-194952d1aae9(bryon-tier2) 
 │  │ namespace: bryon-tier2
@@ -224,7 +224,7 @@ Links created from this site:
 
 Current links from other sites that are connected:
 
-	 Incoming link from site 132f381b-aa11-440c-a0e1-eb2300050096 on namespace bryon-full-s1
+	 Incoming link from site 132f381b-aa11-440c-a0e1-eb2300050096 on namespace bryon-base-s1
 ```
 Here you can see one inbound link and one outbound link.
 
