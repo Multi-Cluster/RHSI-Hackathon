@@ -363,6 +363,11 @@ From here, you should be able to go and Add to Cart and Place an Order.
 
 Your application has now been migrated. As a stretch objective you can update the Route53 to point to the Tier 1 cluster and then delete the On-Premises namespace entitrely.
 
+View the result in the Service Interconnect Console. Note that it may take a few minutes for the links from on-premises to the Tier 1/2/3 site to disappear.
+
+   <img src=./docs/img/s1-topology4.png>
+
+
 
 #### Screenshots
 
