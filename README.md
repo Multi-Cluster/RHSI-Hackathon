@@ -1,9 +1,31 @@
-# Use Online Boutique with Kustomize
+# Deploying the Online Boutique
 
-This page contains instructions on deploying variations of the [Online Boutique]
+This page contains instructions on deploying The Online Boutique application into a single namespace.
+
+## Environment Overview
+
+```TBC```
+
+## Accessing the Environment
+
+Before you start you will need your facilitator to provide the user ids and passwords for each system in the environment.
+
+```TBC```
 
 
-## Deploy Online Boutique with Kustomize
+## Getting Set Up to Start the Hackathon
+
+### Deploy Online Boutique
+
+To get set for the hackathon you should start by deploying the entire application into a singke namespace on the ``Tier 1`` cluster.
+
+#### Log on to the Tier 1 Bastion Server
+
+```TBC```
+
+```ssh lab-user@<insert url>```
+
+#### Deploy the Application
 
 1. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory.
 
