@@ -230,69 +230,63 @@ Here you can see one inbound link and one outbound link.
 
 
 ### Step 6: Deploy Microservices
-Ensure that Tier 2 and Tier 3 namespaces are devoid of microservices by running `oc get pod`. Everything should be bare.
-Clone the Online Boutique microservices demo repository into the Tier 2 and 3 clusters:
+
+1. Clone the Online Boutique microservices demo repository into the Tier 1, Tier 2, and Tier 3 workstations (bastions):  
+  ```
+  git clone https://github.com/Multi-Cluster/RHSI-Hackathon.git
+  ```
+
+2. Change to the Openshift directory:  
+  ```
+  cd RHSI-Hackathon/online-boutique/Openshift/
+  ```
+
+3. Deploy each layer into the respective cluster.  
+
+| Cluster | Command |
+|---------|---------|
+| Tier 1 | ``oc apply -f frontend --recursive`` |
+| Tier 2 | ``oc apply -f middleware --recursive`` |
+| Tier 3 | ``oc apply -f payments --recursive`` |
+
+E.g. On Tier 1:``
+```
+oc apply -f frontend --recursive
+```
+
+Verify that the pods are deployed in the cluster:
 
 ```
-git clone https://github.com/Multi-Cluster/RHSI-Hackathon.git
-```
-
-Navigate to the kustomize directory:
-
-```
-cd RHSI-Hackathon/online-boutique/Openshift
-```
-
-Apply the overlays dir applicable to the Tier 2 cluster:
-
-```
-oc apply -f middleware --recursive
-```
-
-Verify that the pods are deployed in the Tier 2 cluster:
-
-```
-$ oc get pod
+oc get pods
 NAME                                          READY   STATUS    RESTARTS   AGE
-adservice-64c764d94b-tcvkz                    1/1     Running   0          50s
-cartservice-5cc8799bb5-smxgv                  1/1     Running   0          50s
-checkoutservice-57c7c76b4-bxwzs               1/1     Running   0          50s
-currencyservice-7f74bd4f76-xqn5s              1/1     Running   0          50s
-productcatalogservice-849757575b-5plpp        1/1     Running   0          50s
-recommendationservice-667ff888b-wszrs         1/1     Running   0          50s
-redis-cart-6cf65677c4-h8scq                   1/1     Running   0          50s
-shippingservice-5c4865ddc8-fslqw              1/1     Running   0          50s
-skupper-prometheus-867f57b89-cksgb            1/1     Running   0          17h
-skupper-router-5c8c764568-gglg9               2/2     Running   0          17h
-skupper-service-controller-856db7d6c7-bf7jj   2/2     Running   0          17h
+frontend-75789c9f7f-grfkc                     1/1     Running   0          30s
+skupper-prometheus-6fc68fc6c6-86t57           1/1     Running   0          80m
+skupper-router-77464544dc-vkzg4               2/2     Running   0          80m
+skupper-service-controller-849f66bff5-qlw6g   2/2     Running   0          80m
 ```
 
-Repeat the same for Tier 3.
+Get the pods for each Tier and ensure they have all started before proceeding.
 
-```
-$ oc apply -f payments --recursive
-service/emailservice created
-service/paymentservice created
-deployment.apps/emailservice created
-deployment.apps/paymentservice created
-```
-
-Verify the correct pods have been deployed
-
-```
-$ oc get pod
-NAME                                          READY   STATUS    RESTARTS   AGE
-emailservice-6c996685db-r9xc6                 1/1     Running   0          71s
-paymentservice-8d5c98486-wqgv2                1/1     Running   0          71s
-skupper-prometheus-867f57b89-xw2zc            1/1     Running   0          17h
-skupper-router-f94cff94d-hmkx5                2/2     Running   0          17h
-skupper-service-controller-5c8db58cb5-sglfc   2/2     Running   0          17
-```
 
 ### Step 7: Expose Services via Skupper
+At this point we have made all the deployments to the different sites, but we have not published the services so they can be reached over the Service Interconnect Network. If you view the topology in the Service Interconnect Console you will observe that despite being deployed, nothing is communicating over Service Interconnect:
+
+   <img src=./docs/img/s1-topology1.png alt="Console" width="700" height="500">
+
+
+So now we will go ahead and wite everything up...
+
 Expose each microservice deployment in its respective namespace/cluster using Skupper.
 
-Tier 2 namespace:
+Expose the Tier 3 services to the network.
+
+Tier 3: 
+```
+skupper expose deployment emailservice && \
+skupper expose deployment paymentservice
+```
+
+Tier 2:
 
 ```
 skupper expose deployment adservice && \
@@ -305,17 +299,11 @@ skupper expose deployment redis-cart && \
 skupper expose deployment shippingservice
 ```
 
-Tier 3 namespace:
-
-```
-skupper expose deployment emailservice && \
-skupper expose deployment paymentservice
-```
-
 Observe the changes in the Services annotations.
 
 ```
-$ oc get svc emailservice -o yaml | grep selector -A 4
+oc get svc emailservice -o yaml | grep selector -A 4
+
   selector:
     application: skupper-router
     skupper.io/component: router
@@ -323,29 +311,58 @@ $ oc get svc emailservice -o yaml | grep selector -A 4
   type: ClusterIP
 ```
 
-### Step 8: Verify Mesh Spanning
-Ensure that the microservice mesh spans across all three clusters. You should just be able to run oc get svc from any cluster/namespace and see all of them visible.
+So you have now deployed all three tiers of the application. So the next step is to scale down the on-premises components while leaving the on-premises route in place. Service Interconnect will route the traffic to the component in Tier1, 2, or 3 as required.
 
-We’re now going to effectively decomm the On-Prem namespace. Expose the frontend service in the On-Prem namespace and scale down all microservices in the original On-Prem namespace to 0 replicas. We don’t however want to scale down the loadgenerator or frontend running in the background!
+### Step 8: Decommision On Premsies
+
+Lets start by just scaling down one component.
+
+**On-Premises Cluster**
 
 ```
-export TEAMNAME_ONPREM_NS="<your-team>-onprem" && \
-skupper expose deployment frontend -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment adservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment cartservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment checkoutservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment currencyservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment emailservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment paymentservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment productcatalogservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment recommendationservice -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment redis-cart -n ${TEAMNAME_ONPREM_NS} && \
-oc scale --replicas=0 deployment shippingservice -n ${TEAMNAME_ONPREM_NS}
+oc scale --replicas=0 deployment cartservice
+```
+
+Now open the store web site and try adding something to the cart. Open the Service Interconnect Console and observe the traffic is flowing from On-Premises to Tier 2. **Note, your screen will look slightly different to this example.**
+
+   <img src=./docs/img/s1-topology3.png alt="Console" width="700" height="500">
+
+
+Now scale down the rest of the on-premises application. When wehave done that there will be no pods running on-premises, but the route will still be going via the on-premises cluster. This is a perfect example of how Service Interconnect creates a locationless application and how it enables progressive migration with zero downtime.
+
+First we expose the frontend deployment to Service INterconnect so the route will remain interrupted when we scale the frontend down. 
+
+***Please pay attention to which cluster you run these command on or everything will break.***
+
+**On the Tier 1 Cluster**
+
+```
+skupper expose deployment frontend
+```
+
+**On the Base Cluster**
+
+Now we scale down the rest of the application:  
+```
+oc scale --replicas=0 deployment frontend  && \
+oc scale --replicas=0 deployment adservice  && \
+oc scale --replicas=0 deployment cartservice && \
+oc scale --replicas=0 deployment checkoutservice && \
+oc scale --replicas=0 deployment currencyservice && \
+oc scale --replicas=0 deployment emailservice && \
+oc scale --replicas=0 deployment paymentservice && \
+oc scale --replicas=0 deployment productcatalogservice && \
+oc scale --replicas=0 deployment recommendationservice && \
+oc scale --replicas=0 deployment redis-cart && \
+oc scale --replicas=0 deployment shippingservice
 ```
 
 Visit the frontend URL from the On-Prem namespace and perform actions like adding items to the cart and making payments to verify functionality. 
 
 From here, you should be able to go and Add to Cart and Place an Order.
+
+Your application has now been migrated. As a stretch objective you can update the Route53 to point to the Tier 1 cluster and then delete the On-Premises namespace entitrely.
+
 
 #### Screenshots
 
@@ -353,51 +370,4 @@ From here, you should be able to go and Add to Cart and Place an Order.
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [![Screenshot of boutique-landing](/docs/img/boutique_landing.png)](/docs/img/boutique_landing.png) | [![Screenshot of checkout screen](/docs/img/placed_order.png)](/docs/img/placed_order.png) |
 
-### Step 9: Migrate Frontend Service
-Prepare for the migration of the frontend service to another namespace within the SAME (on-prem) cluster. 
 
-**NOTE**:  While the conceptual idea involves deploying to another cluster, the practical implementation will utilize another namespace named `tier1`.
-
-We don’t intend to decommission the route; however, from the original ON-PREM namespace. The external LB will continue to serve traffic to this namespace to the route.
-
-Create the new Tier 1 namespace.
-
-```
-oc new-project <your-team>>-tier1-s1
-```
-
-Deploy the frontend via kustomize
-
-```
-oc apply -f frontend --recursive
-```
-
-Follow the same steps as for other clusters (Steps 4 & 5): initialize Skupper in addition to creating tokens and links.
-
-For the link connection we want to create the token in On-Prem, and create the link from the Tier 1 namespace.
-
-You should now have two connected namespaces will you run `skupper link status` from the original On Prem namespace.
-
-```
-$ skupper link status
-
-Links created from this site:
-
-	 There are no links configured or connected
-
-Current links from other sites that are connected:
-
-	 Incoming link from site 9f5e5d3c-2a65-4fa0-ad3d-01ad389f58e2 on namespace ${TIER1_FRONTEND_NS}
-	 Incoming link from site 78884fa3-f77e-48e2-85f6-e1d920edf8c6 on namespace ${TIER2_NS}
-```
-
-Now we want to expose the frontend service in the Tier 1 namespace via Skupper and then finish off our decommissioning activities in the On-Prem namespace by scaling down the originating `frontend` workload.
-
-```
-export TEAMNAME_ONPREM_NS="<your-team>>-onprem" && \
-export TEAMNAME_TIER1_NS="<your-team>>-tier1-s1" && \
-skupper expose deployment frontend -n ${TEAMNAME_TIER1_NS} && \
-oc scale --replicas=0 deployment frontend -n ${TEAMNAME_ONPREM_NS} 
-```
-
-You should now be able to visit the original Frontend route and verify its operation.
