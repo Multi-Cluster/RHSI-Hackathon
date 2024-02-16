@@ -117,11 +117,9 @@ Note, because we are migrating tiers one at a time we would most likely establis
 | Tier 3 | Tier 2 |
 | Tier 2 | Tier 1 |
 
-This will stop the network flows bewteen Tier 2/Tier 3 and Tier 1/Tier 2 always having to flow through Base.
+This would stop the network flows bewteen Tier 2/Tier 3 and Tier 1/Tier 2 always having to flow through Base. We won't do that because the instructions become more complex. However, you can do this yourself if you like.
 
 This direction is important because endorsed network paths typically flow form high trust to low trust and not the other way around.
-
-Since Service Sync is enabled, a transitional trust relationship will exist between On-Prem and Tier 3 clusters, ensuring that all services exposed via Skupper will be visible in each cluster/namespace.
 
 ### Commands:
 
@@ -130,6 +128,7 @@ Since Service Sync is enabled, a transitional trust relationship will exist betw
 
 ```
 skupper token create ~/tier1.token
+cat tier1.token
 ```
 
 #### Tier 2:  
@@ -145,6 +144,7 @@ Now repeat this process to crate a link between the Tier 2 and Tier 3 sites:
 1. Generate a token.  
 ```
 skupper token create ~/tier2.token
+cat tier2.token
 ```
 
 #### Tier 3:
@@ -158,6 +158,7 @@ skupper link create ~/tier2.token
 1. Generate a token  
 ```
 skupper token create ~/tier3.token
+cat tier3.token
 ```
 
 #### Base:
@@ -167,61 +168,66 @@ skupper token create ~/tier3.token
 skupper link create ~/tier3.token
 ```
 
-These should be the resulting outputs of `skupper link status` in each of the clusters
+Observe the network status in the Service Interconnect Console:
 
-*Tier 1*
+   <img src=./docs/img/s1-links.png alt="Console" width="700" height="500">
+
+
+You can also view the network topology from the command line:  
+```
+$ skupper network status
+
+Sites:
+├─ [local] 132f381b-aa11-440c-a0e1-eb2300050096(bryon-full-s1) 
+│  │ namespace: bryon-full-s1
+│  │ site name: on-prem
+│  │ version: 1.5.3
+│  ╰─ Linked sites:
+│     ╰─ dc7a5c3e-f4b5-4a58-8eee-695a0d9c90de(bryon-tier3)
+│        direction: outgoing
+├─ [remote] dc7a5c3e-f4b5-4a58-8eee-695a0d9c90de(bryon-tier3) 
+│  │ namespace: bryon-tier3
+│  │ site name: tier-3
+│  │ version: 1.5.3
+│  ╰─ Linked sites:
+│     ├─ 3fee8ed7-2f0e-4632-bc50-194952d1aae9(bryon-tier2)
+│     │  direction: outgoing
+│     ╰─ 132f381b-aa11-440c-a0e1-eb2300050096(bryon-full-s1)
+│        direction: incoming
+├─ [remote] 3fee8ed7-2f0e-4632-bc50-194952d1aae9(bryon-tier2) 
+│  │ namespace: bryon-tier2
+│  │ site name: tier-2
+│  │ version: 1.5.3
+│  ╰─ Linked sites:
+│     ├─ dc7a5c3e-f4b5-4a58-8eee-695a0d9c90de(bryon-tier3)
+│     │  direction: incoming
+│     ╰─ 5f801c01-f0e6-4e68-b674-d61782b1701d(bryon-tier1)
+│        direction: outgoing
+╰─ [remote] 5f801c01-f0e6-4e68-b674-d61782b1701d(bryon-tier1) 
+   │ namespace: bryon-tier1
+   │ site name: tier-1
+   │ version: 1.5.3
+   ╰─ Linked sites:
+      ╰─ 3fee8ed7-2f0e-4632-bc50-194952d1aae9(bryon-tier2)
+         direction: incoming
+```
+
+You can also view the link status of each site. E.g. In Tier 3
+
 
 ```
-$ skupper link status
-
+skupper link status
 
 Links created from this site:
-
-
-	 There are no links configured or connected
-
-
-Current links from other sites that are connected:
-
-
-	 Incoming link from site 78884fa3-f77e-48e2-85f6-e1d920edf8c6 on namespace ${NAMESPACE}
-```
-
-*Tier 2*
-
-```
-$ skupper link status
-
-
-Links created from this site:
-
 
 	 Link link1 is connected
 
-
 Current links from other sites that are connected:
 
-
-	 Incoming link from site ad0854aa-0a23-49bf-84ff-797e315e8619 on namespace ${NAMESPACE}
+	 Incoming link from site 132f381b-aa11-440c-a0e1-eb2300050096 on namespace bryon-full-s1
 ```
+Here you can see one inbound link and one outbound link.
 
-*Tier 3*
-
-```
-$ skupper link status
-
-
-Links created from this site:
-
-
-	 Link link1 is connected
-
-
-Current links from other sites that are connected:
-
-
-	 There are no connected links
-```
 
 ### Step 6: Deploy Microservices
 Ensure that Tier 2 and Tier 3 namespaces are devoid of microservices by running `oc get pod`. Everything should be bare.
