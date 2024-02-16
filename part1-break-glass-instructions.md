@@ -93,37 +93,78 @@ skupper init --site-name tier-2 --enable-console --enable-flow-collector --conso
 skupper init --site-name tier-3 --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password
 ```
 
-**Note:** From this point forward we will refer to each project as Full-App, Tier 1, Tier 2, or Tier 3.
+**Note:** From this point forward we will refer to each project as ```Base```, ```Tier 1```, ```Tier 2```, or ```Tier 3```.
+
+You have now installed Service Interconnect. You can access the Service Interconnect console through the route. E.g. In the ```Base``` project, 
+```
+oc get route skupper
+```
+
+Paste the route from above into your browser.  The username/password is: ``admin/password``. Keep this tab open and use it to observe what is happening in the network as you proceed through the steps.
+
+   <img src=./docs/img/s1-console.png alt="Console" width="700" height="400">
+
 
 ## Step 5: Create the Service Interconnect Network
-Create the mesh to establish peer networks between the clusters. We'll create two peer networks where On-Prem will trust Tier 2, and Tier 3 will trust Tier 2.
+
+Next create the links between the sites. The links will be established in the direction of "most trusted site" to "less trusted site." I.e. **Base --> Tier 3 --> Tier 2 --> Tier 1**
+
+Note, because we are migrating tiers one at a time we would most likely establish the link according to this table (where Site A is higher trust than Site B):
+
+| Site A | Site B |
+| -------|--------|
+| Base | Tier 1, Tier 2, Tier 3 |
+| Tier 3 | Tier 2 |
+| Tier 2 | Tier 1 |
+
+This will stop the network flows bewteen Tier 2/Tier 3 and Tier 1/Tier 2 always having to flow through Base.
+
+This direction is important because endorsed network paths typically flow form high trust to low trust and not the other way around.
 
 Since Service Sync is enabled, a transitional trust relationship will exist between On-Prem and Tier 3 clusters, ensuring that all services exposed via Skupper will be visible in each cluster/namespace.
 
-#### Commands:
+### Commands:
 
-On-Prem: **Generate a token**.
-
-```
-skupper token create ~/onprem.token
-```
-
-Tier 2: **Copy the token and create a link using it.**
+#### Tier 1
+1. Generate a token.
 
 ```
-skupper link create ~/onprem.token
+skupper token create ~/tier1.token
 ```
 
-Tier 2: **Generate a token.**
+#### Tier 2:  
+1. Copy the token and create a file ``tier1.token``.
+2. Create the link from thei Tier 2 to Tier 1 site:
+```
+skupper link create ~/tier1.token
+```
 
+Now repeat this process to crate a link between the Tier 2 and Tier 3 sites:
+
+#### Tier 2:
+1. Generate a token.  
 ```
 skupper token create ~/tier2.token
 ```
 
-Tier 3: **Copy the token and create a link using it.**
-
+#### Tier 3:
+1. Copy the token and create a file ``tier2.token``.
+2. Create the link from the Tier 3 to Tier 2 site:  
 ```
 skupper link create ~/tier2.token
+```
+
+### Tier 3:
+1. Generate a token  
+```
+skupper token create ~/tier3.token
+```
+
+#### Base:
+1. Copy the token and create a file ``tier3.token``.
+2. Create the link from the Base to Tier 3 site:  
+```
+skupper link create ~/tier3.token
 ```
 
 These should be the resulting outputs of `skupper link status` in each of the clusters
