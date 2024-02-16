@@ -1,9 +1,23 @@
-## Red Hat Service Interconnect - February APAC Hackathon
+# Red Hat Service Interconnect - February APAC Hackathon
 
-## Scenario 1 - Service Sync ENABLED
+# Scenario 1 - Service Sync ENABLED
 
-### Step 1: Inventory of Existing Pods
-Begin by assessing the pods deployed within the designated namespace in the on-premises cluster. The following pods are currently set up:
+## Step 1: Inventory of "Monoliths" Existing Pods
+Begin by reviewing the deployment that was provided for you.
+
+Replace ``<your-team>`` with the team name provided by your facilitator.  
+Using the  project ```<yourteam>-full-s1``` on the ```on-prem``` cluster, get all the pods.
+
+```
+oc login -u <your-team> <cluster url>
+
+oc project <yourteam>-full-s1
+
+oc get pods
+
+```
+
+The following pods are currently set up:
 
 ```
 NAME                                     READY   STATUS    RESTARTS   AGE
@@ -21,38 +35,67 @@ redis-cart-5f59546cdd-5jnqf              1/1     Running   0          2m58s
 shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
 ```
 
-### Step 2: Access Tiered OpenShift Clusters
-Login to the Tier 2 and Tier 3 OpenShift (OCP) clusters hosted in the cloud. Each services is destined for either the Tier 2 or 3 cluster:
+Get the route so you can access the application via the route. Note that it is HTTP, not HTTPS in the url.  
+```
+oc get routes
+```
+E.g. http://frontend-team1-full-s1.apps.cluster-2txjp.2txjp.sandbox2634.opentlc.com  
 
-* **Tier 2 Cluster**: Cart, Product Catalog, Currency, Shipping, Checkout, Recommendation, Ad, and Redis cache.
-* **Tier 3 Cluster**: Payment and Email services.
+## Step 2: Access the Three Target OpenShift Clusters
 
-### Step 3: Create the namespaces
+***In separate terminal windows***, login to the ```AWS MELB``` and ```AWS SYD``` and ```AWS SING``` OpenShift (OCP) clusters. E.g.:  
 
-Create the following namespaces in each of the above clusters as per the set naming convention.
+   ![Front screen](./docs/img/s1-login.png)  
 
-*Tier 2*
+
+The application will be deployed into three tiers distributed across the three clusters. The project/cluster mapping is:  
+  | Project | Cluster | Notes |
+  |---------|---------|-------|
+  | < your-team >-base-s1 | ON-PREM | Full single-namespace application |
+  | < your-team >-tier1-s1 | AWS MELB | Front end services |
+  | < your-team >-tier2-s1 | AWS SYD | Cart, Product Catalog, Currency, Shipping, Checkout, Recommendation, Ad, and Redis cache |
+  | < your-team >-tier3-s1 | AWS SING | Payment and Email services. |  
+
+
+## Step 3: Create the namespaces
+
+Because we will be progressively migrating and avoiding application outages, we must first deploy Service Interconnect into each project.  
+
+Using the naming convention in the table above, create the namespaces in each cluster. E.g. on the ``AWS MELB`` cluster you would enter this command:  
 
 ```
-oc new-project teamname-tier2-s1
+oc new-project <your-team>-tier1-s1
 ```
 
-*Tier 3*
 
-```
-oc new-project teamname-tier3-s1
-```
+## Step 4: Skupper Initialisation
+Once you have created each project, install Service Interconnect.
 
-### Step 4: Skupper Initialization
-Initialize Skupper in all clusters, including the on-premises one. Execute the following command:
-
+#### On Premises (Full Application)
 ```
-skupper init --enable-console --enable-flow-collector
+skupper init --site-name on-prem --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password
 ```
 
-This command will deploy a single instance each of the Skupper router, service-controller, and Prometheus.
+#### AWS-MELB (Tier 1)
+```
+skupper init --site-name tier-1 --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password
+```
 
-### Step 5: Mesh Generation
+
+#### AWS-SYD (Tier 2)
+```
+skupper init --site-name tier-2 --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password
+```
+
+
+#### AWS-SING (Tier 3)
+```
+skupper init --site-name tier-3 --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password
+```
+
+**Note:** From this point forward we will refer to each project as Full-App, Tier 1, Tier 2, or Tier 3.
+
+## Step 5: Create the Service Interconnect Network
 Create the mesh to establish peer networks between the clusters. We'll create two peer networks where On-Prem will trust Tier 2, and Tier 3 will trust Tier 2.
 
 Since Service Sync is enabled, a transitional trust relationship will exist between On-Prem and Tier 3 clusters, ensuring that all services exposed via Skupper will be visible in each cluster/namespace.
@@ -239,7 +282,7 @@ Ensure that the microservice mesh spans across all three clusters. You should ju
 We’re now going to effectively decomm the On-Prem namespace. Expose the frontend service in the On-Prem namespace and scale down all microservices in the original On-Prem namespace to 0 replicas. We don’t however want to scale down the loadgenerator or frontend running in the background!
 
 ```
-export TEAMNAME_ONPREM_NS="teamname-onprem" && \
+export TEAMNAME_ONPREM_NS="<your-team>-onprem" && \
 skupper expose deployment frontend -n ${TEAMNAME_ONPREM_NS} && \
 oc scale --replicas=0 deployment adservice -n ${TEAMNAME_ONPREM_NS} && \
 oc scale --replicas=0 deployment cartservice -n ${TEAMNAME_ONPREM_NS} && \
@@ -273,7 +316,7 @@ We don’t intend to decommission the route; however, from the original ON-PREM 
 Create the new Tier 1 namespace.
 
 ```
-oc new-project teamname-tier1-s1
+oc new-project <your-team>>-tier1-s1
 ```
 
 Deploy the frontend via kustomize
@@ -304,8 +347,8 @@ Current links from other sites that are connected:
 Now we want to expose the frontend service in the Tier 1 namespace via Skupper and then finish off our decommissioning activities in the On-Prem namespace by scaling down the originating `frontend` workload.
 
 ```
-export TEAMNAME_ONPREM_NS="teamname-onprem" && \
-export TEAMNAME_TIER1_NS="teamname-tier1-s1" && \
+export TEAMNAME_ONPREM_NS="<your-team>>-onprem" && \
+export TEAMNAME_TIER1_NS="<your-team>>-tier1-s1" && \
 skupper expose deployment frontend -n ${TEAMNAME_TIER1_NS} && \
 oc scale --replicas=0 deployment frontend -n ${TEAMNAME_ONPREM_NS} 
 ```
