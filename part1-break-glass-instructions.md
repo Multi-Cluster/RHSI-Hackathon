@@ -274,7 +274,7 @@ At this point we have made all the deployments to the different sites, but we ha
    <img src=./docs/img/s1-topology1.png alt="Console" width="700" height="500">
 
 
-So now we will go ahead and wite everything up...
+So now we will go ahead and wire everything up...
 
 Expose each microservice deployment in its respective namespace/cluster using Skupper.
 
