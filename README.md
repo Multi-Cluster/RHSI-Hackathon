@@ -14,6 +14,17 @@ Requirements:
 
 The objective is to progressively migrate microservices to different cloud VPCs while maintaining functionality. 
 
+## Documentation
+
+The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
+
+| Topic                               | Documentation Link                                    |
+|-------------------------------------|-------------------------------------------------------|
+| Install Skupper                     | [Documentation](https://skupper.io/install/index.html) |
+| Working with Tokens                 | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
+| Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html) |
+| Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
+
 ## Scenario 2
 
 Now both functionality and **security** are of importance to the hybrid architecture of your Online Boutique. 
@@ -29,6 +40,13 @@ Requirements:
    - Tier3 trusts Tier2
   
 5. Migrate the route to the Tier1 namespace (i.e. both the workload and the route should now reside in the same namespace).
+## Documentation
+
+| Topic                               | Documentation Link                                    |
+|-------------------------------------|-------------------------------------------------------|
+| Disabling service sync                | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
+| Skupper service create              | [Documentation](https://skupper.io/docs/cli/index.html#exposing-services-on-the-service-network-from-a-namespace) |
+
 
 ## Scenario 3 (BONUS)
 
@@ -38,16 +56,6 @@ Requirements:
 
 1. Update your Route 53 hosted zone with a CNAME record to point to the Frontend route
 
-## Documentation
-
-The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
-
-| Topic                               | Documentation Link                                    |
-|-------------------------------------|-------------------------------------------------------|
-| Install Skupper                     | [Documentation](https://skupper.io/install/index.html) |
-| Working with Tokens                 | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
-| Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html) |
-| Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
 
 # Deploying the Online Boutique
 
@@ -61,14 +69,58 @@ This page contains instructions on deploying The Online Boutique application int
 
 Before you start you will need your facilitator to provide the user ids and passwords for each system in the environment.
 
-```TBC```
+You can either use the bastion provided above or use your local machine for the hackathon. Bastion will have all the required softwares pre installed like Skupper cli, oc cli etc but you will have to install them in your local.
+
+| Component                               | Download Link                                    |
+|-------------------------------------|-------------------------------------------------------|
+| Install Skupper cli                  | [Download here](https://skupper.io/install/index.html) |
+| openshift cli                       | [Download here](https://skupper.io/install/index.html) |
+| git cli                             | [Download here](https://git-scm.com/downloads)
 
 
 ## Getting Set Up to Start the Hackathon
 
-### Deploy Online Boutique
+Online boutique application is already installed into a single namespace in the OnPrem Cluster provided above. To view and get a feel of the application.
 
-To get set for the hackathon you should start by deploying the entire application into a singke namespace on the ``Tier 1`` cluster.
+#### Log on to the Tier 1 Bastion Server
+
+```TBC```
+
+```ssh lab-user@<insert url>```
+
+```
+bash
+oc project teamname-onprem
+
+oc get pods
+```
+
+The output should be similar to the following:
+
+```terminal
+NAME                                     READY   STATUS    RESTARTS   AGE
+adservice-76bdd69666-ckc5j               1/1     Running   0          2m58s
+cartservice-66d497c6b7-dp5jr             1/1     Running   0          2m59s
+checkoutservice-666c784bd6-4jd22         1/1     Running   0          3m1s
+currencyservice-5d5d496984-4jmd7         1/1     Running   0          2m59s
+emailservice-667457d9d6-75jcq            1/1     Running   0          3m2s
+frontend-6b8d69b9fb-wjqdg                1/1     Running   0          3m1s
+loadgenerator-665b5cd444-gwqdq           1/1     Running   0          3m
+paymentservice-68596d6dd6-bf6bv          1/1     Running   0          3m
+productcatalogservice-557d474574-888kr   1/1     Running   0          3m
+recommendationservice-69c56b74d4-7z8r5   1/1     Running   0          3m1s
+shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
+```
+
+1. Access the web frontend in a browser using the frontend's `Route`.  
+
+```bash
+oc get route frontend -o jsonpath='{.spec.host}'
+```
+
+### Deploy Online Boutique - FOR REFERENCE ONLY
+
+To get set for the hackathon you should start by deploying the entire application into a single namespace on the ``Tier 1`` cluster.
 
 #### Log on to the Tier 1 Bastion Server
 
