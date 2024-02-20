@@ -1,33 +1,100 @@
-# Migratate the online boutique to different openshift clusters
-
-- [Migratate the online boutique to different openshift clusters](#migratate-the-online-boutique-to-different-openshift-clusters)
+# Red Hat Service Interconnect - February APAC Hackathon
+# Scenario 1 - Service Sync Disabled
+- [Red Hat Service Interconnect - February APAC Hackathon](#red-hat-service-interconnect---february-apac-hackathon)
+- [Scenario 1 - Service Sync Disabled](#scenario-1---service-sync-disabled)
   - [Pre-requisites](#pre-requisites)
+  - [Step 1: Inventory of "Monoliths" Existing Pods](#step-1-inventory-of-monoliths-existing-pods)
+  - [Step 2: Access the Three Target OpenShift Clusters](#step-2-access-the-three-target-openshift-clusters)
+  - [Step 3: Create the namespaces](#step-3-create-the-namespaces)
   - [Clone the code base](#clone-the-code-base)
   - [current state](#current-state)
   - [End state](#end-state)
   - [Migration Steps](#migration-steps)
-    - [Install RHSI](#install-rhsi)
-      - [OnPrem cluster](#onprem-cluster)
-      - [Tier1 cluster](#tier1-cluster)
-      - [Tier2 cluster](#tier2-cluster)
-      - [Tier3 cluster](#tier3-cluster)
-  - [Connect/Link the sites](#connectlink-the-sites)
+  - [Step 4: Skupper Initialisation](#step-4-skupper-initialisation)
+      - [On Premises (Base Application)](#on-premises-base-application)
+      - [AWS-MELB (Tier 1)](#aws-melb-tier-1)
+      - [AWS-SYD (Tier 2)](#aws-syd-tier-2)
+      - [AWS-SING (Tier 3)](#aws-sing-tier-3)
+  - [Step 5: Create the Service Interconnect Network](#step-5-create-the-service-interconnect-network)
     - [**Concepts**](#concepts)
-    - [**Tier1 cluster**](#tier1-cluster-1)
-    - [**OnPrem cluster**](#onprem-cluster-1)
-    - [**Tier2 cluster**](#tier2-cluster-1)
-    - [**Tier3 cluster**](#tier3-cluster-1)
-  - [**Application migration**](#application-migration)
-    - [**Tier3 cluster**](#tier3-cluster-2)
-    - [Tier2 Cluster](#tier2-cluster-2)
-    - [Tier1 Cluster](#tier1-cluster-2)
+    - [**Tier1 cluster**](#tier1-cluster)
+    - [**OnPrem cluster**](#onprem-cluster)
+    - [**Tier2 cluster**](#tier2-cluster)
+    - [**Tier3 cluster**](#tier3-cluster)
+    - [Step 6: Deploy Microservices](#step-6-deploy-microservices)
+    - [Tier2 Cluster](#tier2-cluster-1)
+    - [Tier1 Cluster](#tier1-cluster-1)
 
 ## Pre-requisites
 
    1. Skupper cli - Download it [**here**](https://skupper.io/releases/index.html)
    2. oc cli Download it [**here**](http://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.14.0/openshift-client-linux-4.14.0.tar.gz)
    3. Access to openshift clusters 
-   
+## Step 1: Inventory of "Monoliths" Existing Pods
+Begin by reviewing the deployment that was provided for you.
+
+Replace ``<your-team>`` with the team name provided by your facilitator.  
+Using the  project ```<yourteam>-base-s2``` on the ```on-prem``` cluster, get all the pods.
+
+```
+oc login -u <your-team> <cluster url>
+
+oc project <yourteam>-base-s2
+
+oc get pods
+
+```
+
+The following pods are currently set up:
+
+```
+NAME                                     READY   STATUS    RESTARTS   AGE
+adservice-76bdd69666-ckc5j               1/1     Running   0          2m58s
+cartservice-66d497c6b7-dp5jr             1/1     Running   0          2m59s
+checkoutservice-666c784bd6-4jd22         1/1     Running   0          3m1s
+currencyservice-5d5d496984-4jmd7         1/1     Running   0          2m59s
+emailservice-667457d9d6-75jcq            1/1     Running   0          3m2s
+frontend-6b8d69b9fb-wjqdg                1/1     Running   0          3m1s
+loadgenerator-665b5cd444-gwqdq           1/1     Running   0          3m
+paymentservice-68596d6dd6-bf6bv          1/1     Running   0          3m
+productcatalogservice-557d474574-888kr   1/1     Running   0          3m
+recommendationservice-69c56b74d4-7z8r5   1/1     Running   0          3m1s
+redis-cart-5f59546cdd-5jnqf              1/1     Running   0          2m58s
+shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
+```
+
+Get the route so you can access the application via the route. Note that it is HTTP, not HTTPS in the url.  
+```
+oc get routes
+```
+E.g. http://frontend-team1-base-s2.apps.cluster-2txjp.2txjp.sandbox2634.opentlc.com  
+
+
+## Step 2: Access the Three Target OpenShift Clusters
+
+***In separate terminal windows***, login to the ```AWS MELB``` and ```AWS SYD``` and ```AWS SING``` OpenShift (OCP) clusters. E.g.:  
+
+   ![Front screen](./docs/img/s1-login.png)  
+
+
+The application will be deployed into three tiers distributed across the three clusters. The project/cluster mapping is:  
+  | Project | Cluster | Notes |
+  |---------|---------|-------|
+  | < your-team >-base-s2 | ON-PREM | Full single-namespace application |
+  | < your-team >-tier1-s2 | AWS MELB | Front end services |
+  | < your-team >-tier2-s2 | AWS SYD | Cart, Product Catalog, Currency, Shipping, Checkout, Recommendation, Ad, and Redis cache |
+  | < your-team >-tier3-s2 | AWS SING | Payment and Email services. | 
+
+
+## Step 3: Create the namespaces
+
+Because we will be progressively migrating and avoiding application outages, we must first deploy Service Interconnect into each project.  
+
+Using the naming convention in the table above, create the namespaces in each cluster. E.g. on the ``AWS MELB`` cluster you would enter this command:  
+
+```
+oc new-project <your-team>-tier1-s2
+```
 
 ## Clone the code base
 
@@ -81,9 +148,9 @@ git clone https://github.com/Multi-Cluster/RHSI-Hackathon.git
   ```
 
 ## Migration Steps
-
-### Install RHSI
-#### OnPrem cluster
+## Step 4: Skupper Initialisation
+Once you have created each project, install Service Interconnect.
+#### On Premises (Base Application)
 1. Install RHSI in the application namespace on the OnPrem cluster
 
 ```
@@ -96,10 +163,10 @@ oc project rmallam-base
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name base  --console-user admin --console-password redh@T
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name base  --console-user admin --console-password password
 
 ```
-#### Tier1 cluster
+#### AWS-MELB (Tier 1)
 2. Install RHSI in the frontend namespace on the Tier1 cluster
 
 Create a namespace with a suffix of your team name. 
@@ -114,10 +181,10 @@ oc new-project rmallam-frontend
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name frontend --console-user admin --console-password redh@T
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name frontend --console-user admin --console-password password
 
 ```
-#### Tier2 cluster
+#### AWS-SYD (Tier 2)
 3. Install RHSI in the middleware namespace on the Tier2 cluster
 
 Create a namespace with a suffix of your team name. 
@@ -132,10 +199,10 @@ oc new-project rmallam-middleware
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name middleware --console-user admin --console-password redh@T
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name middleware --console-user admin --console-password password
 
 ```
-#### Tier3 cluster
+#### AWS-SING (Tier 3)
 3. Install RHSI in the middleware namespace on the Tier3 cluster
 
 Create a namespace with a suffix of your team name.
@@ -150,11 +217,22 @@ oc new-project rmallam-payments
 ```
 
 ```
-skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name payments --console-user admin --console-password redh@T
+skupper init --enable-flow-collector --enable-console --enable-service-sync=false --site-name payments --console-user admin --console-password password
 
 ```
 
-## Connect/Link the sites
+**Note:** From this point forward we will refer to each project as ```Base```, ```Tier 1```, ```Tier 2```, or ```Tier 3```.
+
+You have now installed Service Interconnect. You can access the Service Interconnect console through the route. E.g. In the ```Base``` project, 
+```
+oc get route skupper
+```
+
+Paste the route from above into your browser.  The username/password is: ``admin/password``. Keep this tab open and use it to observe what is happening in the network as you proceed through the steps.
+
+   <img src=./docs/img/s1-console.png alt="Console" width="700" height="400">
+
+## Step 5: Create the Service Interconnect Network
 
 ### **Concepts**
 
@@ -261,11 +339,15 @@ graph LR
     
 
 ```
-## **Application migration**
+### Step 6: Deploy Microservices
 
-### **Tier3 cluster**
 
-1. starting with the most restricted applications first. payments and email service should go onto payments namespace in tier3 cluster. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory and apply the mainfests.
+1. Clone the Online Boutique microservices demo repository into the Tier 1, Tier 2, and Tier 3 workstations (bastions):  
+    ```
+    git clone https://github.com/Multi-Cluster/RHSI-Hackathon.git
+    ```
+
+2. starting with the most restricted applications first. payments and email service should go onto payments namespace in tier3 cluster. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory and apply the mainfests.
 
     ```bash
     cd online-boutique/Openshift/
@@ -289,7 +371,7 @@ graph LR
     skupper-service-controller-9c66bf75f-4ffc4   2/2     Running   0          4h13m
     ```
 
-2. expose the payment and email services via skupper.
+3. expose the payment and email services via skupper.
    
 
    ```
