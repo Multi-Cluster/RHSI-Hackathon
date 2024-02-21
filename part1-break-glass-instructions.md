@@ -245,9 +245,9 @@ Here you can see one inbound link and one outbound link.
 
 | Cluster | Command |
 |---------|---------|
-| Tier 1 | ``oc apply -f frontend --recursive`` |
-| Tier 2 | ``oc apply -f middleware --recursive`` |
-| Tier 3 | ``oc apply -f payments --recursive`` |
+| Tier 1 | ``oc apply -f tier1 --recursive`` |
+| Tier 2 | ``oc apply -f tier2 --recursive`` |
+| Tier 3 | ``oc apply -f tier3 --recursive`` |
 
 E.g. On Tier 1:``
 ```
