@@ -222,3 +222,8 @@ frontend   frontend-team-a-base-s2.apps-crc.testing          frontend   port8080
 
 Would create this url:  ``http://frontend-team-a-base-s2.apps-crc.testing``
 
+
+# Review Your Work
+Open the Service Interconnect Console and observe the new topology
+
+  ![Front screen](./docs/img/s2-topology2.png)  
