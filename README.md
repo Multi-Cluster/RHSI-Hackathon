@@ -62,10 +62,94 @@ Requirements:
 This page contains instructions on deploying The Online Boutique application into a single namespace.
 
 ## Environment Overview
-This challenge makes use of four OpenShift Clusters.
+This challenge makes use of four OpenShift Clusters. 
+
+The application is a traditional 3-tier app but all three tiers are currently deployed into a single namespace on the on-premises cluster.
 
 
-```TBC```
+  ```mermaid
+  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      A[["On-Prem cluster  
+      (Singapore)
+        -------------------
+        Full Single-Namespace Application "]]
+```
+
+The mission is to progressively migrate the application to three different clusters that are hosted in different geographies.
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices"]]
+
+    B --> C --> D    
+  ```
+
+Each cluster has a bastion host that you can use to work directly with the cluster. By SSHing to the Bastion you have pre-configured access to your OpenShift cluster, and the ``oc`` and ``skupper`` cli tools are already installed.
+
+Using the Bastion hosts is completely optional, you can use your own terminal if you choose. This will mean that you need to the install ``skupper`` and ``oc`` cli tools on your laptop.
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart
+
+      A[["Base cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices"]]
+
+
+      E[["RHEL Base Bastion 
+      (AWS Melbourne)
+        -------------------"]]
+
+      F[["RHEL Bastion 1 
+      (AWS Melbourne)
+        -------------------"]]
+
+      G[["RHEL Bastion 2 
+      (AWS Sydney)
+        -------------------"]]
+
+      H[["RHEL Bastion 3
+      {AWS Singapore)}
+        -------------------"]]
+
+      E --> A
+      F --> B
+      G --> C
+      H --> D
+    
+  ```
+
+
 
 ## Git Repository Structure
 The challenge will use a git repo that contains all of the deployment artifacts that you will need.  
@@ -89,15 +173,37 @@ The challenge will use a git repo that contains all of the deployment artifacts 
 │       │   ├── redis.yaml
 │       │   └── shippingservice.yaml
 │       └── tier3                                  <= All deployment artifacts for Tier 1 of the application
+│           ├── emailservice.yaml
+│           └── paymentservice.yaml
 ├── README.md
 └── scripts                                        <= Handy scripts to run oc in different terminals on a laptop
 ```
 
 ## Accessing the Environment
 
+
 Before you start you will need your facilitator to provide the user ids and passwords for each system in the environment.
 
 You can either use the bastion provided above or use your local machine for the hackathon. Bastion will have all the required softwares pre installed like Skupper cli, oc cli etc but you will have to install them in your local.
+
+| Host | SSH command | Password |
+| ---- | ----------- | -------- |
+| Base Bastion | TBD | TBD |
+| Tier 1 Bastion | TBD | TBD |
+| Tier 2 Bastion | TBD | TBD |
+| Tier 3 Bastion | TBD | TBD |
+
+### OpenShift Console Connection Details
+| Cluster | Console URL | Username | Password |
+| ------- | ----------- | -------- | -------- |
+| Base On-Premises | TBD | *your team name* | TBD |
+| AWS Melbourne | TBD | *your team name* | TBD |
+| AWS Sydney | TBD | *your team name* | TBD |
+| AWS Singapore | TBD | *your team name* | TBD |
+
+
+## Installing the Command Line Tools
+If you are not using the Bastion hosts you will need to install the correct versions of the cli tools. These can be found here:
 
 | Component                               | Download Link                                    |
 |-------------------------------------|-------------------------------------------------------|
@@ -108,9 +214,9 @@ You can either use the bastion provided above or use your local machine for the 
 
 ## Getting Set Up to Start the Hackathon
 
-Online boutique application is already installed into a single namespace in the OnPrem Cluster provided above. To view and get a feel of the application.
+Online boutique application is already installed into a single namespace in the ``Base`` On Premises Cluster provided above. To view and get a feel of the application.
 
-#### Log on to the Tier 1 Bastion Server
+#### Log on to the Base Bastion Server
 
 ```TBC```
 
