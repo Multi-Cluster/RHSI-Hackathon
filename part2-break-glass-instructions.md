@@ -213,7 +213,7 @@ Open the route for the frontend on the Base cluster and you should be able to ac
 oc get route frontend
 ```
 
-Copy the url into your browser, but make sure you add **http://** to the fron of the url. E.g.
+Copy the url into your browser, but make sure you add **http://** to the front **(NOT https://)** of the url. E.g.
 ```
 $ oc get route frontend
 NAME       HOST/PORT                                 PATH   SERVICES   PORT       TERMINATION   WILDCARD
