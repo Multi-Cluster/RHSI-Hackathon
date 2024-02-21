@@ -243,11 +243,11 @@ Here you can see one inbound link and one outbound link.
 
 3. Deploy each layer into the respective cluster.  
 
-| Cluster | Command |
-|---------|---------|
-| Tier 1 | ``oc apply -f tier1 --recursive`` |
-| Tier 2 | ``oc apply -f tier2 --recursive`` |
-| Tier 3 | ``oc apply -f tier3 --recursive`` |
+| Cluster | Command | Role |
+|---------|---------|------|
+| Tier 1 | ``oc apply -f tier1 --recursive`` | The Tier 1 cluster will host the frontend. |
+| Tier 2 | ``oc apply -f tier2 --recursive`` | The Tier 2 cluster will host all the middleware |
+| Tier 3 | ``oc apply -f tier3 --recursive`` | The Tier 3 custer will host the backend components |
 
 E.g. On Tier 1:``
 ```
