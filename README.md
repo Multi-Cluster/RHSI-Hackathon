@@ -62,6 +62,8 @@ Requirements:
 This page contains instructions on deploying The Online Boutique application into a single namespace.
 
 ## Environment Overview
+This challenge makes use of four OpenShift Clusters.
+
 
 ```TBC```
 
