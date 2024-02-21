@@ -67,6 +67,32 @@ This challenge makes use of four OpenShift Clusters.
 
 ```TBC```
 
+## Git Repository Structure
+The challenge will use a git repo that contains all of the deployment artifacts that you will need.  
+```
+.
+├── docs
+├── images                                         <= Images used in the documentation
+├── online-boutique
+│   └── Openshift
+│       ├── tier1                                  <= All deployment artifacts for Tier 1 of the application
+│       │   └── frontend.yaml
+│       ├── loadgenerator
+│       │   └── loadgenerator.yaml
+│       ├── tier2                                  <= All deployment artifacts for Tier 1 of the application
+│       │   ├── adservice.yaml
+│       │   ├── cartservice.yaml
+│       │   ├── checkoutservice.yaml
+│       │   ├── currencyservice.yaml
+│       │   ├── productcatalogservice.yaml
+│       │   ├── recommendationservice.yaml
+│       │   ├── redis.yaml
+│       │   └── shippingservice.yaml
+│       └── tier3                                  <= All deployment artifacts for Tier 1 of the application
+├── README.md
+└── scripts                                        <= Handy scripts to run oc in different terminals on a laptop
+```
+
 ## Accessing the Environment
 
 Before you start you will need your facilitator to provide the user ids and passwords for each system in the environment.
