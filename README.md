@@ -62,10 +62,94 @@ Requirements:
 This page contains instructions on deploying The Online Boutique application into a single namespace.
 
 ## Environment Overview
-This challenge makes use of four OpenShift Clusters.
+This challenge makes use of four OpenShift Clusters. 
+
+The application is a traditional 3-tier app but all three tiers are currently deployed into a single namespace on the on-premises cluster.
 
 
-```TBC```
+  ```mermaid
+  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      A[["On-Prem cluster  
+      (Singapore)
+        -------------------
+        Full Single-Namespace Application "]]
+```
+
+The mission is to progressively migrate the application to three different clusters that are hosted in different geographies.
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices"]]
+
+    B <--> C <--> D    
+  ```
+
+Each cluster has a bastion host that you can use to work directly with the cluster. By SSHing to the Bastion you have pre-configured access to your OpenShift cluster, and the ``oc`` and ``skupper`` cli tools are already installed.
+
+Using the Bastion hosts is completely optional, you can use your own terminal if you choose. This will mean that you need to the install ``skupper`` and ``oc`` cli tools on your laptop.
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart
+
+      A[["Base cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices"]]
+
+
+      E[["RHEL Base Bastion 
+      (AWS Melbourne)
+        -------------------"]]
+
+      F[["RHEL Bastion 1 
+      (AWS Melbourne)
+        -------------------"]]
+
+      G[["RHEL Bastion 2 
+      (AWS Sydney)
+        -------------------"]]
+
+      H[["RHEL Bastion 3
+      {AWS Singapore)}
+        -------------------"]]
+
+      E --> A
+      F --> B
+      G --> C
+      H --> D
+    
+  ```
+
+
 
 ## Git Repository Structure
 The challenge will use a git repo that contains all of the deployment artifacts that you will need.  
