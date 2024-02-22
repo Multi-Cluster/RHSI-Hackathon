@@ -1,65 +1,32 @@
 # Red Hat Service Interconnect - February APAC Hackathon
 
-Baker's Bargain Barn online retail website requires restructuring its architecture for scalability and security. The migration must ensure ZERO SERVICE DISRUPTION and refrain from altering application code or design. The frontend service relocates to Tier1 Cluster, while Payments and Email services migrate to the most secure cluster (Tier3). The remainder of the microservices should be destined for the Tier2 cluster. 
+## Background
 
-## Scenario 1 
+Acme's Bargain Barn is an online retail store based in Singapore. Their website deployment architecture requires restructuring so they can continue to scale, improve securitry, and move workloads to cloud.
 
-Requirements:
+The online retail store is a traditional 3-tier architecture, however all three tiers have been deployed into a single on-premises OpenShift namespace. For technical reasons not important to this activity, Acme have landed on a deployment architecture that will place each tier in different regions.
 
-1. Zero service disruption throughout the migration (outages will be monitored for)
-2. Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1-s1 for Tier1 Cluster etc.)
-3. No changes to the application code and/or K8s manifests
-4. Deploy to three clusters where ALL services are visible to each other (**HINT:** cast your eyes to the `service-sync-enabled` flag as part of the `skupper` CLI)
-5. Maintain the `frontend` route should still remain in the on-prem namespace
+Your team's task is to take the existing fully-functional store and move each tier to the correct region - WITH ZERO SERVICE INTERRUPTION.
 
-The objective is to progressively migrate microservices to different cloud VPCs while maintaining functionality. 
+Luckily Acme have just procured Red Hat Service Interconnect - an application-networking solution that among facilitates moving application components around with zero code changes.
 
-## Documentation
+## Activity 
 
-The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
+You are in a race to capture the flag!!! The first team to migrate their application using two different methods will be the winner of an increadibly average prize... (Sorry - budgets are tight.)
 
-| Topic                               | Documentation Link                                    |
-|-------------------------------------|-------------------------------------------------------|
-| Install Skupper                     | [Documentation](https://skupper.io/install/index.html) |
-| Working with Tokens                 | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
-| Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html) |
-| Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
+You will be broken into cross-functional teams where you will use your collective skills to work out how to use Service Interconnect to progressively migrate the application whilst not impacting the service. To do this you will need to read up on Service Interconnect's features and commands. But don't worry - we will give you links to the most important commands.
 
-## Scenario 2
+The key Service Interconnect concepts you will need to understand to get to the finish line are:
+* Sites
+* Links
+* Services and Service Endpoints
+* Service Synchronisation
 
-Now both functionality and **security** are of importance to the hybrid architecture of your Online Boutique. 
+Scenario 1 will require you to migrate the application and let Service Interconnect work out where to publish the service.  
+Scenario 2 will require you to migrate the application and then selectively expose which services are exposed in which application tier.
 
-Requirements:
-
-1. Zero service disruption throughout the migration (outages will be monitored for)
-2. Naming of namespaces follows the convention of prefixing team names to all created namespaces, with tier-specific designations (e.g., Teamname-tier1-s2 for Tier1 Cluster etc.)
-3. No changes to the application code and/or K8s manifests
-4. Deploy to three clusters with restricted visibility of services, following a trust relationship where:
-
-   - Tier2 trusts Tier1
-   - Tier3 trusts Tier2
-  
-5. Migrate the route to the Tier1 namespace (i.e. both the workload and the route should now reside in the same namespace).
-## Documentation
-
-| Topic                               | Documentation Link                                    |
-|-------------------------------------|-------------------------------------------------------|
-| Disabling service sync                | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
-| Skupper service create              | [Documentation](https://skupper.io/docs/cli/index.html#exposing-services-on-the-service-network-from-a-namespace) |
-
-
-## Scenario 3 (BONUS)
-
-DO NOT DELETE what you've created in Scenario 2. This is an extension of that scenario's end product.
-
-Requirements:
-
-1. Update your Route 53 hosted zone with a CNAME record to point to the Frontend route
-
-
-# Deploying the Online Boutique
-
-This page contains instructions on deploying The Online Boutique application into a single namespace.
+### Don't Panic
+If you get stuck and want to wave the white flag - then we have a set of "break glass" instructions that will walk you through each solution.
 
 ## Environment Overview
 This challenge makes use of four OpenShift Clusters. 
@@ -98,6 +65,8 @@ The mission is to progressively migrate the application to three different clust
     B --> C --> D    
   ```
 
+### Accessing the Clusters
+
 Each cluster has a bastion host that you can use to work directly with the cluster. By SSHing to the Bastion you have pre-configured access to your OpenShift cluster, and the ``oc`` and ``skupper`` cli tools are already installed.
 
 Using the Bastion hosts is completely optional, you can use your own terminal if you choose. This will mean that you need to the install ``skupper`` and ``oc`` cli tools on your laptop.
@@ -105,7 +74,7 @@ Using the Bastion hosts is completely optional, you can use your own terminal if
 ```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
   flowchart
 
-      A[["Base cluster 
+      A[["On-Prem cluster 
       (AWS Melbourne)
         -------------------
         Frontend microservices"]]
@@ -126,7 +95,7 @@ Using the Bastion hosts is completely optional, you can use your own terminal if
         Payments microservices"]]
 
 
-      E[["RHEL Base Bastion 
+      E[["RHEL On-Prem Bastion 
       (AWS Melbourne)
         -------------------"]]
 
@@ -149,10 +118,48 @@ Using the Bastion hosts is completely optional, you can use your own terminal if
     
   ```
 
+## Accessing the Environments
 
+Before you start you will need your facilitator to provide the user ids and passwords for each system in the environment.
+
+You can either use the bastion provided above or use your local machine for the hackathon. Bastion will have all the required softwares pre installed like Skupper cli, oc cli etc but you will have to install them in your local.
+
+### Bastion Host Connection Details
+
+| Host | SSH command | Password |
+| ---- | ----------- | -------- |
+| On-Prem Bastion | TBD | TBD |
+| Tier 1 Bastion | TBD | TBD |
+| Tier 2 Bastion | TBD | TBD |
+| Tier 3 Bastion | TBD | TBD |
+
+### OpenShift Console Connection Details
+| Cluster | Console URL | Username | Password |
+| ------- | ----------- | -------- | -------- |
+| On-Prem On-Premises | TBD | *your team name* | TBD |
+| AWS Melbourne | TBD | *your team name* | TBD |
+| AWS Sydney | TBD | *your team name* | TBD |
+| AWS Singapore | TBD | *your team name* | TBD |
+
+
+## Getting Set Up to Start the Hackathon
+
+## Installing the Command Line Tools (Optional)
+**If you are not using the Bastion hosts** you will need to install the correct versions of the cli tools. These can be found here:
+
+| Component                               | Download Link                                    |
+|-------------------------------------|-------------------------------------------------------|
+| Install Skupper cli                  | [Download here](https://skupper.io/install/index.html) |
+| openshift cli                       | [Download here](https://skupper.io/install/index.html) |
+| git cli                             | [Download here](https://git-scm.com/downloads)
 
 ## Git Repository Structure
-The challenge will use a git repo that contains all of the deployment artifacts that you will need.  
+The challenge will use a git repo that contains all of the deployment artifacts that you will need. You will need to clone the repository into each bastion host. 
+
+The ``./online-boutique/OpenShift`` directory is where you will do all your work out of. 
+
+***You will not need to edit any of the files in order to accomplish the tasks.*** Just apply each yaml file to deploy each component.
+
 ```
 .
 ├── docs
@@ -179,52 +186,20 @@ The challenge will use a git repo that contains all of the deployment artifacts 
 └── scripts                                        <= Handy scripts to run oc in different terminals on a laptop
 ```
 
-## Accessing the Environment
+## Existing Boutique Store Walkthrough
+Online boutique application is already installed into a single namespace in the ``On-Prem`` On Premises Cluster provided above. To view and get a feel of the application.
 
+### Log on to the On-Prem Bastion Server
 
-Before you start you will need your facilitator to provide the user ids and passwords for each system in the environment.
+Use the connectivity details described above to SSH to the On-Prem bastion server. E.g.:
 
-You can either use the bastion provided above or use your local machine for the hackathon. Bastion will have all the required softwares pre installed like Skupper cli, oc cli etc but you will have to install them in your local.
+```ssh blue-team@on-prem.bastion.host.com```
 
-| Host | SSH command | Password |
-| ---- | ----------- | -------- |
-| Base Bastion | TBD | TBD |
-| Tier 1 Bastion | TBD | TBD |
-| Tier 2 Bastion | TBD | TBD |
-| Tier 3 Bastion | TBD | TBD |
-
-### OpenShift Console Connection Details
-| Cluster | Console URL | Username | Password |
-| ------- | ----------- | -------- | -------- |
-| Base On-Premises | TBD | *your team name* | TBD |
-| AWS Melbourne | TBD | *your team name* | TBD |
-| AWS Sydney | TBD | *your team name* | TBD |
-| AWS Singapore | TBD | *your team name* | TBD |
-
-
-## Installing the Command Line Tools
-If you are not using the Bastion hosts you will need to install the correct versions of the cli tools. These can be found here:
-
-| Component                               | Download Link                                    |
-|-------------------------------------|-------------------------------------------------------|
-| Install Skupper cli                  | [Download here](https://skupper.io/install/index.html) |
-| openshift cli                       | [Download here](https://skupper.io/install/index.html) |
-| git cli                             | [Download here](https://git-scm.com/downloads)
-
-
-## Getting Set Up to Start the Hackathon
-
-Online boutique application is already installed into a single namespace in the ``Base`` On Premises Cluster provided above. To view and get a feel of the application.
-
-#### Log on to the Base Bastion Server
-
-```TBC```
-
-```ssh lab-user@<insert url>```
+Connect to your team's project
 
 ```
 bash
-oc project teamname-onprem
+oc project blue-team-onprem
 
 oc get pods
 ```
@@ -251,65 +226,8 @@ shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
 ```bash
 oc get route frontend -o jsonpath='{.spec.host}'
 ```
+Paste the route into your browser. **Note:** The url needs to be ``http``, not ``https``.
 
-### Deploy Online Boutique - FOR REFERENCE ONLY
-
-To get set for the hackathon you should start by deploying the entire application into a single namespace on the ``Tier 1`` cluster.
-
-#### Log on to the Tier 1 Bastion Server
-
-```TBC```
-
-```ssh lab-user@<insert url>```
-
-#### Deploy the Application
-
-1. From the root folder of this repository, navigate to the `online-boutique/Openshift/` directory.
-
-    ```bash
-    cd online-boutique/Openshift/
-    ```
-
-2. Login to the on-prem cluster and create your namespace as per the advised naming convention.
-
-    ```bash
-    oc new-project teamname-onprem
-    ```
-   
-3. Apply the templates under (`online-boutique/Openshift/`).
-
-    ```bash
-    oc apply -f . --recursive
-    ```
-
-4. Wait for all Pods to show `STATUS` of `Running`.
-
-    ```bash
-    oc get pods
-    ```
-
-    The output should be similar to the following:
-
-    ```terminal
-    NAME                                     READY   STATUS    RESTARTS   AGE
-    adservice-76bdd69666-ckc5j               1/1     Running   0          2m58s
-    cartservice-66d497c6b7-dp5jr             1/1     Running   0          2m59s
-    checkoutservice-666c784bd6-4jd22         1/1     Running   0          3m1s
-    currencyservice-5d5d496984-4jmd7         1/1     Running   0          2m59s
-    emailservice-667457d9d6-75jcq            1/1     Running   0          3m2s
-    frontend-6b8d69b9fb-wjqdg                1/1     Running   0          3m1s
-    loadgenerator-665b5cd444-gwqdq           1/1     Running   0          3m
-    paymentservice-68596d6dd6-bf6bv          1/1     Running   0          3m
-    productcatalogservice-557d474574-888kr   1/1     Running   0          3m
-    recommendationservice-69c56b74d4-7z8r5   1/1     Running   0          3m1s
-    shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
-    ```
-
-    _Note: It may take 2-3 minutes before the changes are reflected on the deployment._
-
-5. Access the web frontend in a browser using the frontend's `Route`.
-
-    ```bash
-    oc get route frontend -o jsonpath='{.spec.host}'
-    ```
-
+# Challenge Instructions
+Yu are now ready to launch into the challenge. Good luck!!!  
+Click here for the [hackathon instructions](./challenge.md) 
