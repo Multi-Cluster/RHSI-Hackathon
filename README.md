@@ -227,3 +227,7 @@ shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
 oc get route frontend -o jsonpath='{.spec.host}'
 ```
 Paste the route into your browser. **Note:** The url needs to be ``http``, not ``https``.
+
+# Challenge Instructions
+Yu are now ready to launch into the challenge. Good luck!!!  
+Click here for the [hackathon instructions](./challenge.md) 
