@@ -1,0 +1,70 @@
+name: RHSI-Hackathon-setup-env
+
+env:
+
+  ONPREM_OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_ONPREM_SERVER }}
+  ONPREM_OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_ONPREM_TOKEN }}
+  # 🖊️ EDIT to set the kube context's namespace after login. Leave blank to use your user's default namespace.
+  OPENSHIFT_NAMESPACE: ""
+
+  # 🖊️ EDIT to set a name for your OpenShift app, or a default one will be generated below.
+  APP_NAME: ""
+
+  # 🖊️ EDIT with the port your application should be accessible on.
+  # If the container image exposes *exactly one* port, this can be left blank.
+  # Refer to the 'port' input of https://github.com/redhat-actions/oc-new-app
+  APP_PORT: ""
+
+  # 🖊️ EDIT to change the image registry settings.
+  # Registries such as GHCR, Quay.io, and Docker Hub are supported.
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  IMAGE_REGISTRY_USER: ${{ github.actor }}
+  IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
+
+  # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
+  IMAGE_TAGS: ""
+
+on:
+  # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+  workflow_dispatch:
+  push:
+    # Edit to the branch(es) you want to build and deploy on each push.
+    branches: [ "testing" ]
+
+jobs:
+  AWS:
+    # 🖊️ Uncomment this if you are using CRDA scan step above
+    # needs: crda-scan
+    name: Install RHSI on AWS
+    runs-on: ubuntu-20.04
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install oc
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        oc: 4
+              
+    - name: Helm tool installer
+      uses: Azure/setup-helm@v3
+
+    # https://github.com/redhat-actions/oc-login#readme
+    - name: Log in to aws OpenShift
+      uses: redhat-actions/oc-login@v1
+      with:
+        openshift_server_url: ${{ env.ONPREM_OPENSHIFT_SERVER }}
+        openshift_token: ${{ env.ONPREM_OPENSHIFT_TOKEN }}
+        insecure_skip_tls_verify: true
+        namespace: ${{ env.OPENSHIFT_NAMESPACE }}
+        kubeconfig: /tmp/aws
+
+    - name: Create namespace and deploy app
+      run: |
+        oc new-project blue-team-onprem
+        oc apply -f online-boutique/Openshift --recursive
+
