@@ -42,7 +42,7 @@ Requirements:
 | Topic                               | Documentation Link                                    |
 |-------------------------------------|-------------------------------------------------------|
 | Disabling service sync                | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
-| Skupper service create              | [Documentation](https://skupper.io/docs/cli/index.html#exposing-services-on-the-service-network-from-a-namespace) |
+| Skupper service create              | review "skupper init -h" options and search for service-sync |
 
 
 ## Scenario 3 (BONUS)
