@@ -2,7 +2,7 @@
 
 ## Background
 
-Acme's Bargain Barn is an online retail store based in Singapore. Their website deployment architecture requires restructuring so they can continue to scale, improve securitry, and move workloads to cloud.
+Acme's Bargain Barn is an online retail store based in Singapore. Their website deployment architecture requires restructuring so they can continue to scale, improve security, and move workloads to cloud.
 
 The online retail store is a traditional 3-tier architecture, however all three tiers have been deployed into a single on-premises OpenShift namespace. For technical reasons not important to this activity, Acme have landed on a deployment architecture that will place each tier in different regions.
 
@@ -12,7 +12,7 @@ Luckily Acme have just procured Red Hat Service Interconnect - an application-ne
 
 ## Activity 
 
-You are in a race to capture the flag!!! The first team to migrate their application using two different methods will be the winner of an increadibly average prize... (Sorry - budgets are tight.)
+You are in a race to capture the flag!!! The first team to migrate their application using two different methods will be the winner of an incredibly average prize... (Sorry - budgets are tight.)
 
 You will be broken into cross-functional teams where you will use your collective skills to work out how to use Service Interconnect to progressively migrate the application whilst not impacting the service. To do this you will need to read up on Service Interconnect's features and commands. But don't worry - we will give you links to the most important commands.
 
@@ -122,7 +122,7 @@ Using the Bastion hosts is completely optional, you can use your own terminal if
 
 Before you start you will need your facilitator to provide the user ids and passwords for each system in the environment.
 
-You can either use the bastion provided above or use your local machine for the hackathon. Bastion will have all the required softwares pre installed like Skupper cli, oc cli etc but you will have to install them in your local.
+You can either use the bastion provided above or use your local machine for the hackathon. Bastion will have all the required software pre installed like Skupper cli, oc cli etc but you will have to install them in your local.
 
 ### Bastion Host Connection Details
 
