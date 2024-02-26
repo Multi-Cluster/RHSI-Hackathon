@@ -67,7 +67,7 @@ jobs:
       run: |
         while read teamname; do
         team=${teamname}-team-onprem
-        oc new-project ${team}
+        oc new-project ${team} | true
         oc apply -f online-boutique/Openshift --recursive -n ${team}
         done < scripts/teams
 
