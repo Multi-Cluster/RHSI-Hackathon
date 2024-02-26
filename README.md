@@ -199,7 +199,7 @@ Connect to your team's project
 
 ```
 bash
-oc project blue-team-onprem
+oc project blue-team-base-s1
 
 oc get pods
 ```

@@ -66,8 +66,10 @@ jobs:
     - name: Create namespace and deploy app
       run: |
         while read teamname; do
-        team=${teamname}-team-onprem
+        for s in s1 s2; do
+        team=${teamname}-team-base-${s}
         oc new-project ${team} | true
         oc apply -f online-boutique/Openshift --recursive -n ${team}
+        done
         done < scripts/teams
 
