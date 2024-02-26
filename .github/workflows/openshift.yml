@@ -78,7 +78,7 @@ jobs:
         while read teamname; do
         for s in s1 s2; do
         team=${teamname}-base-${s}
-        oc policy add-role-to-user admin teamname -n ${team}
+        oc policy add-role-to-user admin $teamname -n ${team}
         done
         done < scripts/teams
 
