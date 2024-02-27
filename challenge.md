@@ -24,7 +24,7 @@ The following documentation matrix will lead you to important information to ach
 | Using the console | |
 | Exposing Services | |
 | Working with Tokens                 |   |
-| Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html) |
+| Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html,_target=blank) |
 | Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
 
 ## Scenario 2
