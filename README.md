@@ -128,18 +128,18 @@ You can either use the bastion provided above or use your local machine for the 
 
 | Host | SSH command | Password |
 | ---- | ----------- | -------- |
-| On-Prem Bastion | bastion.5vnvb.sandbox1671.opentlc.com | TBD |
-| Tier 1 Bastion | bastion.cjj48.sandbox2957.opentlc.com | TBD |
-| Tier 2 Bastion | bastion.s2k46.sandbox1206.opentlc.com | TBD |
-| Tier 3 Bastion | bastion.kzp2h.sandbox907.opentlc.com | TBD |
+| On-Prem Bastion | bastion.5vnvb.sandbox1671.opentlc.com | TBA |
+| Tier 1 Bastion | bastion.cjj48.sandbox2957.opentlc.com | TBA |
+| Tier 2 Bastion | bastion.s2k46.sandbox1206.opentlc.com | TBA |
+| Tier 3 Bastion | bastion.kzp2h.sandbox907.opentlc.com | TBA |
 
 ### OpenShift Console Connection Details
 | Cluster | Console URL | Username | Password |
 | ------- | ----------- | -------- | -------- |
-| On-Prem On-Premises |  https://console-openshift-console.apps.rosa-5vnvb.67s3.p1.openshiftapps.com | *your team name* | password |
-| AWS Melbourne | https://console-openshift-console.apps.rosa-cjj48.aum3.p1.openshiftapps.com | *your team name* | password |
-| AWS Sydney | https://console-openshift-console.apps.rosa-s2k46.u9xx.p1.openshiftapps.com | *your team name* | password |
-| AWS Singapore | https://console-openshift-console.apps.rosa-kzp2h.r8gx.p1.openshiftapps.com | *your team name* | password |
+| On-Prem On-Premises |  https://console-openshift-console.apps.rosa-5vnvb.67s3.p1.openshiftapps.com | *your team name* | TBA |
+| AWS Melbourne | https://console-openshift-console.apps.rosa-cjj48.aum3.p1.openshiftapps.com | *your team name* | TBA |
+| AWS Sydney | https://console-openshift-console.apps.rosa-s2k46.u9xx.p1.openshiftapps.com | *your team name* | TBA |
+| AWS Singapore | https://console-openshift-console.apps.rosa-kzp2h.r8gx.p1.openshiftapps.com | *your team name* | TBA |
 
 
 ## Getting Set Up to Start the Hackathon
