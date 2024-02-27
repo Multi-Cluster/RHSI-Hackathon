@@ -17,8 +17,13 @@ The following documentation matrix will lead you to important information to ach
 
 | Topic                               | Documentation Link                                    |
 |-------------------------------------|-------------------------------------------------------|
-| Install Skupper                     | [Documentation](https://skupper.io/install/index.html) |
-| Working with Tokens                 | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
+| Install Service Interconnect        | [Documentation](https://skupper.io/install/index.html) |
+| Deploying Service Interconnect      | |
+| Linking sites | [Documentation](https://skupper.io/docs/cli/tokens.html) 
+plus a link for skupper link create) |
+| Using the console | |
+| Exposing Services | |
+| Working with Tokens                 |   |
 | Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html) |
 | Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
 
@@ -41,8 +46,8 @@ Requirements:
 
 | Topic                               | Documentation Link                                    |
 |-------------------------------------|-------------------------------------------------------|
-| Disabling service sync                | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
-| Skupper service create              | review "skupper init -h" options and search for service-sync |
+| Disabling service sync              | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
+| Consuming exposed services          | review "skupper init -h" options and search for service-sync |
 
 
 ## Scenario 3 (BONUS)
