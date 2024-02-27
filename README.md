@@ -229,5 +229,5 @@ oc get route frontend -o jsonpath='{.spec.host}'
 Paste the route into your browser. **Note:** The url needs to be ``http``, not ``https``.
 
 # Challenge Instructions
-Yu are now ready to launch into the challenge. Good luck!!!  
+You are now ready to launch into the challenge. Good luck!!!  
 Click here for the [hackathon instructions](./challenge.md) 
