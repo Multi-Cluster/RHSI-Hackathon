@@ -11,7 +11,3 @@ printf "Setting up isolated Kubernetes environment in: ${YELLOW}$KUBECONFIG${NC}
 printf "NOTE: The command format to run this script is: \". $BASH_SOURCE\"\n"
 
 export PS1="\[$(tput setaf 2)\]$ENVIRONMENT_PROMPT: \[$(tput setaf 7)\]\[$(tput setaf 6)\]\W\\$ \[$(tput setaf 7)\]\[$(tput sgr0)\]"
-
-echo "Deploying frontend and backend to WEST"
-oc new-project west
-oc apply -f yaml/ --recursive
