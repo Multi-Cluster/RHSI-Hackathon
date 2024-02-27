@@ -16,11 +16,11 @@ The objective is to progressively migrate microservices to different cloud VPCs 
 The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
 
 | Topic                               | Documentation Link                                    |
-|-------------------------------------|-------------------------------------------------------|
+|-------------------------------------|-------------------------------------------------------| 
+| Resources                           | (Red Hat Official Doco)https://access.redhat.com/documentation/en-us/red_hat_service_interconnect/1.4/html/getting_started/resources) |
 | Install Service Interconnect        | [Documentation](https://skupper.io/install/index.html) |
 | Deploying Service Interconnect      | |
-| Linking sites | [Documentation](https://skupper.io/docs/cli/tokens.html) 
-plus a link for skupper link create) |
+| Linking sites | [Documentation](https://skupper.io/docs/cli/tokens.html), (plus a link for skupper link create)  |
 | Using the console | |
 | Exposing Services | |
 | Working with Tokens                 |   |
