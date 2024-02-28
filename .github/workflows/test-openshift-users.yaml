@@ -2,8 +2,8 @@ name: RHSI-Hackathon-env-user-testing
 
 env:
 
-  ONPREM_OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_ONPREM_SERVER }}
-  ONPREM_OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_ONPREM_TOKEN }}
+  admin_openshift_password: ${{ secrets.admin_openshift_password }}
+  teams_openshift_password: ${{ secrets.teams_openshift_password }}
   # 🖊️ EDIT to set the kube context's namespace after login. Leave blank to use your user's default namespace.
   OPENSHIFT_NAMESPACE: ""
 
