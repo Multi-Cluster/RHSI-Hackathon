@@ -4,6 +4,10 @@ env:
 
   admin_openshift_password: ${{ secrets.admin_openshift_password }}
   teams_openshift_password: ${{ secrets.teams_openshift_password }}
+  base: "https://api.rosa-5vnvb.67s3.p1.openshiftapps.com:6443"
+  tier1: "https://api.rosa-kzp2h.r8gx.p1.openshiftapps.com:6443"
+  tier2: "https://api.rosa-s2k46.u9xx.p1.openshiftapps.com:6443"
+  tier3: "https://api.rosa-cfrjp.m2lq.p1.openshiftapps.com:6443"
   # 🖊️ EDIT to set the kube context's namespace after login. Leave blank to use your user's default namespace.
   OPENSHIFT_NAMESPACE: ""
 
@@ -53,12 +57,8 @@ jobs:
 
     - name: Create namespace and deploy app
       run: |
-        export base="https://api.rosa-5vnvb.67s3.p1.openshiftapps.com:6443"
-        export tier1="https://api.rosa-kzp2h.r8gx.p1.openshiftapps.com:6443"
-        export tier2="https://api.rosa-s2k46.u9xx.p1.openshiftapps.com:6443"
-        export tier3="https://api.rosa-cfrjp.m2lq.p1.openshiftapps.com:6443"
-        for i in "$base" "$tier1" "$tier2" "$tier3"; do for j in red blue green yellow purple orange olive brown black grey; do  ; echo $i with user $j;  oc login -u $j -p ${{ env.teams_openshift_password}} $i; done;done
-        for i in "$base" "$tier1" "$tier2" "$tier3"; do for j in cluster-admin admin hack-admin; do  ; echo $i ; oc login -u $j -p ${{ env.admin_openshift_password}} $i; done;done
+        for i in "${{ env.base}}" "${{ env.tier1}}" "${{ env.$tier2}}" "${{ env.$tier3}}"; do for j in red blue green yellow purple orange olive brown black grey; do  ; echo $i with user $j;  oc login -u $j -p ${{ env.teams_openshift_password}} $i; done;done
+        for i in "${{ env.base}}" "${{ env.tier1}}" "${{ env.$tier2}}" "${{ env.$tier3}}"; do for j in cluster-admin admin hack-admin; do  ; echo $i ; oc login -u $j -p ${{ env.admin_openshift_password}} $i; done;done
 
     - name: Create admin policy for teams
       run: |
