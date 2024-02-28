@@ -29,7 +29,7 @@ Scenario 2 will require you to migrate the application and then selectively expo
 If you get stuck and want to wave the white flag - then we have a set of "break glass" instructions that will walk you through each solution.
 
 ## Environment Overview
-This challenge makes use of four OpenShift Clusters. 
+This challenge makes use of four OpenShift clusters. 
 
 The application is a traditional 3-tier app but all three tiers are currently deployed into a single namespace on the on-premises cluster.
 
@@ -136,7 +136,7 @@ You can either use the bastion provided above or use your local machine for the 
 ### OpenShift Console Connection Details
 | Cluster | Console URL | Username | Password |
 | ------- | ----------- | -------- | -------- |
-| On-Prem On-Premises |  https://console-openshift-console.apps.rosa-5vnvb.67s3.p1.openshiftapps.com | *your team name* | TBA |
+| On-Prem |  https://console-openshift-console.apps.rosa-5vnvb.67s3.p1.openshiftapps.com | *your team name* | TBA |
 | AWS Melbourne | https://console-openshift-console.apps.rosa-kzp2h.r8gx.p1.openshiftapps.com | *your team name* | TBA |
 | AWS Sydney | https://console-openshift-console.apps.rosa-s2k46.u9xx.p1.openshiftapps.com | *your team name* | TBA |
 | AWS Singapore | https://console-openshift-console.apps.rosa-cfrjp.m2lq.p1.openshiftapps.com | *your team name* | TBA |
@@ -187,19 +187,22 @@ The ``./online-boutique/OpenShift`` directory is where you will do all your work
 ```
 
 ## Existing Boutique Store Walkthrough
-Online boutique application is already installed into a single namespace in the ``On-Prem`` On Premises Cluster provided above. To view and get a feel of the application.
+Online boutique application is already installed into a single namespace in the ``On-Prem`` cluster provided above. To view and get a feel of the application.
 
 ### Log on to the On-Prem Bastion Server
 
 Use the connectivity details described above to SSH to the On-Prem bastion server. E.g.:
 
-```ssh blue-team@on-prem.bastion.host.com```
+```bash
+ssh userX@ec2-13-229-222-30.ap-southeast-1.compute.amazonaws.com
+
+oc login -u <team> -p <TBA> https://api.rosa-5vnvb.67s3.p1.openshiftapps.com:6443
+```
 
 Connect to your team's project
 
-```
-bash
-oc project blue-team-base-s1
+```bash
+oc project <team>-base-s1
 
 oc get pods
 ```
