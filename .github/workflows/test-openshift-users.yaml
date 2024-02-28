@@ -55,7 +55,7 @@ jobs:
       run: |
         export base="https://api.rosa-5vnvb.67s3.p1.openshiftapps.com:6443"
         export tier1="https://api.rosa-kzp2h.r8gx.p1.openshiftapps.com:6443"
-        export tier2=https://api.rosa-s2k46.u9xx.p1.openshiftapps.com:6443
+        export tier2="https://api.rosa-s2k46.u9xx.p1.openshiftapps.com:6443"
         export tier3="https://api.rosa-cfrjp.m2lq.p1.openshiftapps.com:6443"
         for i in "$base" "$tier1" "$tier2" "$tier3"; do for j in red blue green yellow purple orange olive brown black grey; do  ; echo $i with user $j
         oc login -u $j -p ${{ env.teams_openshift_password}} $i; done;done
