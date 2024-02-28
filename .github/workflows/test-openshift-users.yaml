@@ -58,9 +58,9 @@ jobs:
         export tier2=https://api.rosa-s2k46.u9xx.p1.openshiftapps.com:6443
         export tier3="https://api.rosa-cfrjp.m2lq.p1.openshiftapps.com:6443"
         for i in "$base" "$tier1" "$tier2" "$tier3"; do for j in red blue green yellow purple orange olive brown black grey; do  ; echo $i with user $j
-        oc login -u $j -p ${teams_openshift_password} $i; done;done
+        oc login -u $j -p ${{ env.teams_openshift_password}} $i; done;done
         for i in "$base" "$tier1" "$tier2" "$tier3"; do for j in cluster-admin admin hack-admin; do  ; echo $i
-        oc login -u $j -p ${admin_openshift_password} $i; done;done
+        oc login -u $j -p ${{ env.admin_openshift_password}} $i; done;done
 
     - name: Create admin policy for teams
       run: |
