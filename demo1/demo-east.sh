@@ -44,12 +44,28 @@ cmd
 
 pe "oc new-project east"
 
+pe "oc apply -f yaml/backend.yaml"
+
+pe "oc get svc,pods"
+
 pe "skupper init --site-name east --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password"
 
 pe "watch oc get svc,pods"
 
-pe "skupper token create --token-type cert east.yaml"
+pe "skupper token create --token-type cert east-token.yaml"
 
-pe "oc apply -f yaml/backend.yaml"
+echo "*** Move to WEST ***"
 
 pe "skupper expose deployment backend --port 8080"
+
+# pe "oc new-project east"
+
+# pe "skupper init --site-name east --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password"
+
+# pe "watch oc get svc,pods"
+
+# pe "skupper token create --token-type cert east.yaml"
+
+# pe "oc apply -f yaml/backend.yaml"
+
+# pe "skupper expose deployment backend --port 8080"
