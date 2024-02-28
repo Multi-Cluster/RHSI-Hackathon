@@ -11,6 +11,39 @@ Task Requirements:
 
 The objective is to progressively migrate microservices to different cloud VPCs while maintaining functionality. 
 
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+
+      z([User])
+
+      A[["On-Prem cluster  
+      (Singapore)
+        ------------------- 
+        no pods running but
+        all service definitions available here"]]
+
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices pod, service and
+        all service definitions visible here"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices pods, services and
+        all service definitions visible here"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices pods, services and
+        all service definitions visible here"]]
+
+    z --> A --> B --> C --> D    
+  ```
+
 ## Documentation
 
 The following documentation matrix will lead you to important information to achieve the Hackathon's end goal. Running `skupper --help` will also give you plenty of direction. 
@@ -27,6 +60,8 @@ The following documentation matrix will lead you to important information to ach
 | Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html,_target=blank) |
 | Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
 
+
+
 ## Scenario 2
 
 Now both functionality and **security** are of importance to the hybrid architecture of your Online Boutique. 
@@ -42,6 +77,38 @@ Requirements:
    - Tier3 trusts Tier2
   
 5. Migrate the route to the Tier1 namespace (i.e. both the workload and the route should now reside in the same namespace).
+
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+
+      z([User])
+
+      A[["On-Prem cluster  
+      (Singapore)
+        ------------------- 
+        no pods running but
+        Only frontend service definition available here"]]
+
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices pod, service and
+        Only tier2 service definitions visible here"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices pods, services and
+        Only tier3 service definitions visible here"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices pods "]]
+
+    z --> A --> B --> C --> D    
+  ```
 ## Documentation
 
 | Topic                               | Documentation Link                                    |
@@ -57,3 +124,65 @@ DO NOT DELETE what you've created in Scenario 2. This is an extension of that sc
 Requirements:
 
 1. Update your Route 53 hosted zone with a CNAME record to point to the Frontend route
+2. Decommission RHSI on Onprem cluster.
+
+**Before**
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+
+      z([User])
+
+      A[["On-Prem cluster  
+      (Singapore)
+        -------------------
+        Full Single-Namespace Application "]]
+
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices"]]
+
+    z --> A --> B --> C --> D    
+  ```
+
+
+**After**
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      z([User])
+
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices"]]
+
+    z --> B --> C --> D    
+  ```
+
+## Verification:
+
+A load generator service has been deployed to continuously send request to web portal of each team. This will currently be running with a 100% success rate and should continue to be the same at the end of the migration too.
+
+The number of failures will determine the team success of the challenge.
