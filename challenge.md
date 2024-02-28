@@ -115,69 +115,9 @@ Requirements:
 | Disabling service sync              | [Documentation](https://github.com/rmallam/RHSI-helm/blob/main/disable-service-sync.md)  |
 
 
-## Scenario 3 (BONUS)
+## Summary 
 
-DO NOT DELETE what you've created in Scenario 2. This is an extension of that scenario's end product.
-
-Requirements:
-
-1. Update your Route 53 hosted zone with a CNAME record to point to the Frontend route
-2. Decommission RHSI on Onprem cluster.
-
-**Before**
-
-```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
-  flowchart LR
-
-      z([User])
-
-      A[["On-Prem cluster  
-      (Singapore)
-        -------------------
-        Full Single-Namespace Application "]]
-
-      B[["Tier1 cluster 
-      (AWS Melbourne)
-        -------------------
-        Frontend microservices"]]
-
-      C[["Tier2 cluster  
-      (AWS Sydney)
-        -------------------
-        middleware microservices"]]
-
-      D[["Tier3 cluster  
-      {AWS Singapore)}
-        -------------------
-        Payments microservices"]]
-
-    z --> A --> B --> C --> D    
-  ```
-
-
-**After**
-
-```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
-  flowchart LR
-      z([User])
-
-      B[["Tier1 cluster 
-      (AWS Melbourne)
-        -------------------
-        Frontend microservices"]]
-
-      C[["Tier2 cluster  
-      (AWS Sydney)
-        -------------------
-        middleware microservices"]]
-
-      D[["Tier3 cluster  
-      {AWS Singapore)}
-        -------------------
-        Payments microservices"]]
-
-    z --> B --> C --> D    
-  ```
+You've now relocated a route from one OpenShift cluster to another, enabling access to the application through the new route. In practical terms, following this action, the typical procedure involves updating the GSLB external load balancer to direct traffic to the updated route. This step falls outside the scope of the current hackathon but remains a crucial consideration for real-world implementation.
 
 ## Verification:
 
