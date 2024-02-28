@@ -119,6 +119,29 @@ Requirements:
 
 You've now relocated a route from one OpenShift cluster to another, enabling access to the application through the new route. In practical terms, following this action, the typical procedure involves updating the GSLB external load balancer to direct traffic to the updated route. This step falls outside the scope of the current hackathon but remains a crucial consideration for real-world implementation.
 
+
+```mermaid  %%{init: {"flowchart": {"htmlLabels": false}} }%%
+  flowchart LR
+      z([GSLB])
+
+      B[["Tier1 cluster 
+      (AWS Melbourne)
+        -------------------
+        Frontend microservices"]]
+
+      C[["Tier2 cluster  
+      (AWS Sydney)
+        -------------------
+        middleware microservices"]]
+
+      D[["Tier3 cluster  
+      {AWS Singapore)}
+        -------------------
+        Payments microservices"]]
+
+    z --> B --> C --> D    
+  ```
+
 ## Verification:
 
 A load generator service has been deployed to continuously send request to web portal of each team. This will currently be running with a 100% success rate and should continue to be the same at the end of the migration too.
