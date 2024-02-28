@@ -128,10 +128,10 @@ You can either use the bastion provided above or use your local machine for the 
 
 | Host | SSH command | Password |
 | ---- | ----------- | -------- |
-| On-Prem Bastion | bastion.5vnvb.sandbox1671.opentlc.com | TBA |
-| Tier 1 Bastion | bastion.cjj48.sandbox2957.opentlc.com | TBA |
-| Tier 2 Bastion | bastion.s2k46.sandbox1206.opentlc.com | TBA |
-| Tier 3 Bastion | bastion.kzp2h.sandbox907.opentlc.com | TBA |
+| On-Prem Bastion | ec2-13-229-222-30.ap-southeast-1.compute.amazonaws.com | TBA |
+| Tier 1 Bastion | ec2-13-50-252-66.eu-north-1.compute.amazonaws.com | TBA |
+| Tier 2 Bastion | ec2-13-50-225-171.eu-north-1.compute.amazonaws.com | TBA |
+| Tier 3 Bastion | ec2-13-48-126-6.eu-north-1.compute.amazonaws.com | TBA |
 
 ### OpenShift Console Connection Details
 | Cluster | Console URL | Username | Password |
