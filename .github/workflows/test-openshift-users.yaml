@@ -55,7 +55,7 @@ jobs:
         oc: 4
 
 
-    - name: Create namespace and deploy app
+    - name: test login creds
       run: |
         for i in "${{ env.base}}" "${{ env.tier1}}" "${{ env.tier2}}" "${{ env.tier3}}"; do 
           for j in red blue green yellow purple orange olive brown black grey; do  
@@ -70,11 +70,3 @@ jobs:
           done
         done
 
-    - name: Create admin policy for teams
-      run: |
-        while read teamname; do
-        for s in s1 s2; do
-        team=${teamname}-base-${s}
-        oc policy add-role-to-user admin $teamname -n ${team}
-        done
-        done < scripts/teams
