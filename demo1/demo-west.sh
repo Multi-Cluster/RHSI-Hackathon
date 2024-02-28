@@ -44,14 +44,37 @@ cmd
 
 pe "watch oc get pods,svc"
 
+# pe "oc scale deployment/backend --replicas=0"
+pe "oc delete -f yaml/backend.yaml"
+
+pe "watch oc get svc,pods"
+
 pe "skupper init --site-name west --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password"
 
 pe "watch oc get svc,pods"
 
-echo "*** Move to East ***"
+echo "*** Move to EAST ***"
 
-pe "skupper link create east.yaml"
+pe "skupper link create east-token.yaml"
 
-pe "skupper network status"
+echo "*** Move to EAST ***"
 
-pe "oc scale deployment/backend --replicas=0"
+pe "oc delete pod -l application=frontend-app"
+
+pe "oc get svc,pods"
+
+# OLD
+
+# pe "watch oc get pods,svc"
+
+# pe "skupper init --site-name west --enable-console --enable-flow-collector --console-auth=internal --console-user=admin --console-password=password"
+
+# pe "watch oc get svc,pods"
+
+# echo "*** Move to East ***"
+
+# pe "skupper link create east-token.yaml"
+
+# pe "skupper network status"
+
+# pe "oc scale deployment/backend --replicas=0"
