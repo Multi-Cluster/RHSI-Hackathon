@@ -50,14 +50,13 @@ The following documentation matrix will lead you to important information to ach
 
 | Topic                               | Documentation Link                                    |
 |-------------------------------------|-------------------------------------------------------| 
-| Resources                           | (Red Hat Official Doco)https://access.redhat.com/documentation/en-us/red_hat_service_interconnect/1.4/html/getting_started/resources) |
+| Resources                           | [Resources]([https://access.redhat.com/documentation/en-us/red_hat_application_interconnect/](https://access.redhat.com/documentation/en-us/red_hat_service_interconnect/1.4/html/getting_started/resources)
 | Install Service Interconnect        | [Documentation](https://skupper.io/install/index.html) |
-| Deploying Service Interconnect      | |
-| Linking sites | [Documentation](https://skupper.io/docs/cli/tokens.html), (plus a link for skupper link create)  |
-| Using the console | |
-| Exposing Services | |
-| Working with Tokens                 |   |
-| Using the Skupper Console         | [Documentation](https://skupper.io/docs/console/index.html,_target=blank) |
+| Creating a site      | https://skupper.io/docs/cli/index.html#creating-using-cli |
+| Linking sites | https://skupper.io/docs/cli/index.html#linking-sites  |
+| Using the console | https://skupper.io/docs/console/index.html |
+| Exposing Services | https://skupper.io/docs/cli/index.html#exposing-services-ns |
+| Working with Tokens                 | https://skupper.io/docs/cli/index.html#linking-sites |
 | Hello World Example               | [Documentation](https://skupper.io/start/index.html)  |
 
 
