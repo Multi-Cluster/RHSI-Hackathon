@@ -112,8 +112,7 @@ Requirements:
 
 | Topic                               | Documentation Link                                    |
 |-------------------------------------|-------------------------------------------------------|
-| Disabling service sync              | [Documentation](https://skupper.io/docs/cli/tokens.html)  |
-| Consuming exposed services          | review "skupper init -h" options and search for service-sync |
+| Disabling service sync              | [Documentation](https://github.com/rmallam/RHSI-helm/blob/main/disable-service-sync.md)  |
 
 
 ## Scenario 3 (BONUS)
