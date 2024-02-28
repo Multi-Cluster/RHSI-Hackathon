@@ -57,8 +57,18 @@ jobs:
 
     - name: Create namespace and deploy app
       run: |
-        for i in "${{ env.base}}" "${{ env.tier1}}" "${{ env.tier2}}" "${{ env.tier3}}"; do for j in red blue green yellow purple orange olive brown black grey; do  ; echo $i with user $j;  oc login -u $j -p ${{ env.teams_openshift_password}} $i; done;done
-        for i in "${{ env.base}}" "${{ env.tier1}}" "${{ env.tier2}}" "${{ env.tier3}}"; do for j in cluster-admin admin hack-admin; do  ; echo $i ; oc login -u $j -p ${{ env.admin_openshift_password}} $i; done;done
+        for i in "${{ env.base}}" "${{ env.tier1}}" "${{ env.tier2}}" "${{ env.tier3}}"; do 
+          for j in red blue green yellow purple orange olive brown black grey; do  
+            echo $i with user $j
+            oc login -u $j -p ${{ env.teams_openshift_password}} $i
+          done
+        done
+        for i in "${{ env.base}}" "${{ env.tier1}}" "${{ env.tier2}}" "${{ env.tier3}}"; do
+          for j in cluster-admin admin hack-admin; do 
+            echo $i 
+            oc login -u $j -p ${{ env.admin_openshift_password}} $i
+          done
+        done
 
     - name: Create admin policy for teams
       run: |
