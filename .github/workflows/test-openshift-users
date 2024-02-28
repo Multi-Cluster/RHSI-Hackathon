@@ -1,0 +1,72 @@
+name: RHSI-Hackathon-setup-env
+
+env:
+
+  ONPREM_OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_ONPREM_SERVER }}
+  ONPREM_OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_ONPREM_TOKEN }}
+  # 🖊️ EDIT to set the kube context's namespace after login. Leave blank to use your user's default namespace.
+  OPENSHIFT_NAMESPACE: ""
+
+  # 🖊️ EDIT to set a name for your OpenShift app, or a default one will be generated below.
+  APP_NAME: ""
+
+  # 🖊️ EDIT with the port your application should be accessible on.
+  # If the container image exposes *exactly one* port, this can be left blank.
+  # Refer to the 'port' input of https://github.com/redhat-actions/oc-new-app
+  APP_PORT: ""
+
+  # 🖊️ EDIT to change the image registry settings.
+  # Registries such as GHCR, Quay.io, and Docker Hub are supported.
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  IMAGE_REGISTRY_USER: ${{ github.actor }}
+  IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
+
+  # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
+  IMAGE_TAGS: ""
+
+on:
+  # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+  workflow_dispatch:
+  push:
+    # Edit to the branch(es) you want to build and deploy on each push.
+    branches: [ "testing" ]
+
+jobs:
+  AWS:
+    # 🖊️ Uncomment this if you are using CRDA scan step above
+    # needs: crda-scan
+    name: Prepare cluster for hackathon
+    runs-on: ubuntu-20.04
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install oc
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        oc: 4
+
+
+    - name: Create namespace and deploy app
+      run: |
+        export base="https://api.rosa-5vnvb.67s3.p1.openshiftapps.com:6443"
+        export tier1="https://api.rosa-kzp2h.r8gx.p1.openshiftapps.com:6443"
+        export tier2=https://api.rosa-s2k46.u9xx.p1.openshiftapps.com:6443
+        export tier3="https://api.rosa-cfrjp.m2lq.p1.openshiftapps.com:6443"
+        for i in "$base" "$tier1" "$tier2" "$tier3"; do for j in red blue green yellow purple orange olive brown black grey; do  ; echo $i with user $j
+        oc login -u $j -p ${teams_openshift_password} $i; done;done
+        for i in "$base" "$tier1" "$tier2" "$tier3"; do for j in cluster-admin admin hack-admin; do  ; echo $i
+        oc login -u $j -p ${admin_openshift_password} $i; done;done
+
+    - name: Create admin policy for teams
+      run: |
+        while read teamname; do
+        for s in s1 s2; do
+        team=${teamname}-base-${s}
+        oc policy add-role-to-user admin $teamname -n ${team}
+        done
+        done < scripts/teams
