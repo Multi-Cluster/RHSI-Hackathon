@@ -33,6 +33,22 @@ First, repeate Steps 1 through 6 in the Scenario 1 Break Glass.
 
 Expose the services in each application tier to the Service Interconnect network.
 
+### OnPrem:
+
+```
+skupper expose deployment emailservice && \
+skupper expose deployment paymentservice && \
+skupper expose deployment adservice && \
+skupper expose deployment cartservice && \
+skupper expose deployment checkoutservice && \
+skupper expose deployment currencyservice && \
+skupper expose deployment productcatalogservice && \
+skupper expose deployment recommendationservice && \
+skupper expose deployment redis-cart && \
+skupper expose deployment shippingservice && \
+skupper expose deployment frontend
+```
+
 ### Tier 3: 
 ```
 skupper expose deployment emailservice && \
