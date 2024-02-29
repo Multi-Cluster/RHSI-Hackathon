@@ -278,6 +278,22 @@ So now we will go ahead and wire everything up...
 
 Expose each microservice deployment in its respective namespace/cluster using Skupper.
 
+### OnPrem:
+
+```
+skupper expose deployment emailservice && \
+skupper expose deployment paymentservice && \
+skupper expose deployment adservice && \
+skupper expose deployment cartservice && \
+skupper expose deployment checkoutservice && \
+skupper expose deployment currencyservice && \
+skupper expose deployment productcatalogservice && \
+skupper expose deployment recommendationservice && \
+skupper expose deployment redis-cart && \
+skupper expose deployment shippingservice && \
+skupper expose deployment frontend
+```
+
 Expose the Tier 3 services to the network.
 
 Tier 3: 
