@@ -36,7 +36,7 @@ jobs:
     # 🖊️ Uncomment this if you are using CRDA scan step above
     # needs: crda-scan
     name: Prepare cluster for hackathon
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     environment: production
 
     steps:
