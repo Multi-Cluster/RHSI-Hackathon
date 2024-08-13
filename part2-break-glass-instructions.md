@@ -29,7 +29,7 @@ Initialising Service Interconnect with ``--service-sync=false`` will result in a
 ## Steps
 First, repeate Steps 1 through 6 in the Scenario 1 Break Glass.
 
-## Stap 7: Expose the Deployments in Each Tier
+## Step 7: Expose the Deployments in Each Tier
 
 Expose the services in each application tier to the Service Interconnect network.
 
