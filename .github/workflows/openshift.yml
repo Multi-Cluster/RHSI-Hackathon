@@ -72,6 +72,9 @@ jobs:
         oc apply -f online-boutique/Openshift --recursive -n ${team}
         done
         done < scripts/teams
+        oc adm policy add-cluster-role-to-user cluster-admin  cluster-admin
+        oc adm policy add-cluster-role-to-user cluster-admin  hack-admin
+        oc adm policy add-cluster-role-to-user cluster-admin  admin
 
     - name: Create admin policy for teams
       run: |
